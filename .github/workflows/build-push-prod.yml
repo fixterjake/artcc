@@ -23,6 +23,10 @@ jobs:
         VatsimServerOptions.VatsimTokenRequestOptions.ClientId: ${{ secrets.VATSIM_PROD_CLIENT_ID }}
         VatsimServerOptions.VatsimTokenRequestOptions.ClientSecret: ${{ secrets.VATSIM_PROD_CLIENT_SECRET }}
         VatsimServerOptions.VatsimTokenRequestOptions.RedirectUri: ${{ secrets.VATSIM_PROD_REDIRECT_URI }}
+        EmailOptions.Username: ${{ secrets.EMAIL_USERNAME }}
+        EmailOptions.Password: ${{ secrets.EMAIL_PASSWORD }}
+        EmailOptions.From: ${{ secrets.EMAIL_FROM_PROD }}
+        EmailOptions.Website: ${{ secrets.EMAIL_WEBSITE_PROD }}
     - name: Inject jobs secrets
       uses: microsoft/variable-substitution@v1
       with:
