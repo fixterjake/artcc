@@ -1,0 +1,1 @@
+[![Build](https://github.com/vzdc/ZDC.Web/actions/workflows/build.yml/badge.svg)](https://github.com/vzdc/ZDC.Web/actions/workflows/build.yml)

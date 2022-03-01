@@ -1,0 +1,14 @@
+name: Build
+on:
+  pull_request:
+    types: [opened, reopened]
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repo 
+      uses: actions/checkout@v2
+    - name: Build server image 
+      run: docker build -t server -f Server/Dockerfile .
+    #- name: Build jobs image 
+    #  run: docker build -t jobs -f Jobs/Dockerfile .
