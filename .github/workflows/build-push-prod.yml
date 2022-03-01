@@ -27,13 +27,13 @@ jobs:
         EmailOptions.Password: ${{ secrets.EMAIL_PASSWORD }}
         EmailOptions.From: ${{ secrets.EMAIL_FROM_PROD }}
         EmailOptions.Website: ${{ secrets.EMAIL_WEBSITE_PROD }}
-    - name: Inject jobs secrets
-      uses: microsoft/variable-substitution@v1
-      with:
-        files: "./Jobs/appsettings.json"
-      env:
-        ConnectionString: ${{ secrets.CONN_STRING_PROD }}
-        VatusaApiKey: ${{ secrets.VATUSA_API_KEY }}
+    #- name: Inject jobs secrets
+    #  uses: microsoft/variable-substitution@v1
+    #  with:
+    #    files: "./Jobs/appsettings.json"
+    #  env:
+    #    ConnectionString: ${{ secrets.CONN_STRING_PROD }}
+    #    VatusaApiKey: ${{ secrets.VATUSA_API_KEY }}
     - name: Log into registry
       run: docker login -u ${{ secrets.DO_REGISTRY_TOKEN }} -p ${{ secrets.DO_REGISTRY_TOKEN }} registry.digitalocean.com
     - name: Build server image 
