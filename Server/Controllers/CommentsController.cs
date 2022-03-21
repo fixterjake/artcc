@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using ZDC.Server.Repositories.Interfaces;
@@ -15,11 +17,13 @@ public class CommentsController : ControllerBase
 {
     private readonly ICommentRepository _commentRepository;
     private readonly ILoggingService _loggingService;
+    private readonly IValidator<Comment> _validator;
 
-    public CommentsController(ICommentRepository commentRepository, ILoggingService loggingService)
+    public CommentsController(ICommentRepository commentRepository, ILoggingService loggingService, IValidator<Comment> validator)
     {
         _commentRepository = commentRepository;
         _loggingService = loggingService;
+        _validator = validator;
     }
 
     [HttpPost]
@@ -29,11 +33,21 @@ public class CommentsController : ControllerBase
     {
         try
         {
+            var result = await _validator.ValidateAsync(comment);
+            if (!result.IsValid)
+            {
+                return BadRequest(new Response<IList<ValidationFailure>>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Message = "Validation error",
+                    Data = result.Errors
+                });
+            }
             return Ok(await _commentRepository.CreateComment(comment, Request));
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(CreateComment), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(CreateComment), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -58,7 +72,7 @@ public class CommentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetUserComments), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(GetUserComments), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -70,6 +84,16 @@ public class CommentsController : ControllerBase
     {
         try
         {
+            var result = await _validator.ValidateAsync(comment);
+            if (!result.IsValid)
+            {
+                return BadRequest(new Response<IList<ValidationFailure>>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Message = "Validation error",
+                    Data = result.Errors
+                });
+            }
             return Ok(await _commentRepository.UpdateComment(comment, Request));
         }
         catch (AirportNotFoundException ex)
@@ -83,7 +107,7 @@ public class CommentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(UpdateComment), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(UpdateComment), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -108,7 +132,7 @@ public class CommentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(DeleteComment), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(DeleteComment), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 }

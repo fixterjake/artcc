@@ -3,12 +3,12 @@
 public class Settings
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Value { get; set; }
-    public DateTime Updated { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
+    public DateTimeOffset Updated { get; set; }
 
     public Settings()
     {
-        Updated = DateTime.UtcNow;
+        Updated = DateTimeOffset.UtcNow;
     }
 }

@@ -107,7 +107,7 @@ public class UserRepository : IUserRepository
                    throw new RoleNotFoundException($"Role '{roleId}' not found");
 
         var oldData = JsonConvert.SerializeObject(user.Roles);
-        user.Roles.Add(role);
+        user.Roles?.Add(role);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(user.Roles);
 
@@ -131,7 +131,7 @@ public class UserRepository : IUserRepository
                    throw new RoleNotFoundException($"Role '{roleId}' not found");
 
         var oldData = JsonConvert.SerializeObject(user.Roles);
-        user.Roles.Remove(role);
+        user.Roles?.Remove(role);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(user.Roles);
 

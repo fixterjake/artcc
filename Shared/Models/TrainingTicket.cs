@@ -3,21 +3,23 @@
 public class TrainingTicket
 {
     public int Id { get; set; }
-    public User User { get; set; }
-    public User Trainer { get; set; }
+    public int UserId { get; set; }
+    public User? User { get; set; }
+    public int TrainerId { get; set; }
+    public User? Trainer { get; set; }
     public TrainingFacility Facility { get; set; }
     public TrainingPosition Position { get; set; }
     public string PositionFull => $"{Facility}_{Position}";
-    public DateTime Start { get; set; }
-    public DateTime End { get; set; }
-    public string Comments { get; set; }
-    public string InternalComments { get; set; }
+    public DateTimeOffset Start { get; set; }
+    public DateTimeOffset End { get; set; }
+    public string Comments { get; set; } = string.Empty;
+    public string InternalComments { get; set; } = string.Empty;
     public OtsRecommendation OtsRecommendation { get; set; }
-    public DateTime Updated { get; set; }
+    public DateTimeOffset Updated { get; set; }
 
     public TrainingTicket()
     {
-        Updated = DateTime.UtcNow;
+        Updated = DateTimeOffset.UtcNow;
     }
 }
 

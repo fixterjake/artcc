@@ -17,7 +17,7 @@ namespace ZDC.Server.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "6.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -46,12 +46,15 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Altimeter")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Conditions")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Icao")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("InboundFlights")
@@ -64,18 +67,21 @@ namespace ZDC.Server.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<string>("Metar")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("OutboundFlights")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Winds")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -95,12 +101,13 @@ namespace ZDC.Server.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Content")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("SubmitterId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
@@ -124,19 +131,24 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Callsign")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("interval");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTimeOffset>("End")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Frequency")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<DateTimeOffset>("Start")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -157,27 +169,33 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Cid")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Exception")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("Guid")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Ip")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Route")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("StackTrace")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -194,12 +212,14 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("To")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -216,24 +236,27 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTimeOffset>("End")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Host")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("Open")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<DateTimeOffset>("Start")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UploadId")
@@ -258,6 +281,7 @@ namespace ZDC.Server.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Rating")
@@ -278,7 +302,7 @@ namespace ZDC.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTimeOffset>("End")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EventId")
@@ -287,8 +311,11 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("PositionId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<DateTimeOffset>("Start")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -313,18 +340,22 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Callsign")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Cid")
                         .HasColumnType("integer");
 
                     b.Property<string>("ControllerPosition")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("ServiceLevel")
@@ -333,7 +364,7 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
@@ -358,18 +389,21 @@ namespace ZDC.Server.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UploadId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Version")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -424,6 +458,7 @@ namespace ZDC.Server.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Reason")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("Start")
@@ -432,7 +467,7 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
@@ -454,12 +489,14 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
@@ -481,15 +518,17 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("Read")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("UserId")
@@ -511,15 +550,19 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Callsign")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Duration")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Frequency")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("User")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -550,7 +593,7 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
@@ -576,6 +619,7 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -592,9 +636,11 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("NameLong")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Priority")
@@ -614,12 +660,14 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Value")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -638,7 +686,7 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Cert")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTimeOffset>("End")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("OldCert")
@@ -647,10 +695,16 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Position")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("SubmitterId")
+                    b.Property<DateTimeOffset>("Start")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("SubmitterId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("UserId")
+                    b.Property<DateTimeOffset>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -671,24 +725,28 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Affiliation")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTimeOffset>("End")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<DateTimeOffset>("Start")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -705,15 +763,17 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Comments")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTimeOffset>("End")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Facility")
                         .HasColumnType("integer");
 
                     b.Property<string>("InternalComments")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("OtsRecommendation")
@@ -722,16 +782,16 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Position")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<DateTimeOffset>("Start")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("TrainerId")
+                    b.Property<int>("TrainerId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -752,12 +812,14 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -783,21 +845,25 @@ namespace ZDC.Server.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Iad")
                         .HasColumnType("integer");
 
                     b.Property<string>("Initials")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Joined")
+                    b.Property<DateTimeOffset>("Joined")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Minor")
@@ -809,7 +875,7 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("Visitor")
@@ -834,10 +900,11 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Cid")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("LastRatingChange")
+                    b.Property<DateTimeOffset>("LastRatingChange")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Rating")
@@ -849,10 +916,11 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Updated")
+                    b.Property<DateTimeOffset>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("VisitReason")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -901,24 +969,30 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Action")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Cid")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Ip")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("NewData")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("OldData")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -1113,11 +1187,15 @@ namespace ZDC.Server.Migrations
                 {
                     b.HasOne("ZDC.Shared.Models.User", "Submitter")
                         .WithMany()
-                        .HasForeignKey("SubmitterId");
+                        .HasForeignKey("SubmitterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ZDC.Shared.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Submitter");
 
@@ -1128,11 +1206,15 @@ namespace ZDC.Server.Migrations
                 {
                     b.HasOne("ZDC.Shared.Models.User", "Trainer")
                         .WithMany()
-                        .HasForeignKey("TrainerId");
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ZDC.Shared.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Trainer");
 

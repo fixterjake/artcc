@@ -3,18 +3,18 @@
 public class DebugLog
 {
     public int Id { get; set; }
-    public string Ip { get; set; }
-    public string Cid { get; set; }
-    public string Name { get; set; }
-    public string Route { get; set; }
-    public string Exception { get; set; }
-    public string StackTrace { get; set; }
+    public string Ip { get; set; } = string.Empty;
+    public string Cid { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Route { get; set; } = string.Empty;
+    public string Exception { get; set; } = string.Empty;
+    public string StackTrace { get; set; } = string.Empty;
     public Guid Guid { get; set; }
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 
     public DebugLog()
     {
         Guid = Guid.NewGuid();
-        Timestamp = DateTime.UtcNow;
+        Timestamp = DateTimeOffset.UtcNow;
     }
 }

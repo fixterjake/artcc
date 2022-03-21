@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using ZDC.Server.Services.Interfaces;
 using ZDC.Shared.Dtos;
+using ZDC.Shared.Models;
 
 namespace ZDC.Server.Controllers;
 
@@ -10,11 +12,18 @@ public class EventsController : ControllerBase
 {
     private readonly IEmailService _emailService;
     private readonly ILoggingService _loggingService;
+    private readonly IValidator<Event> _eventValidator;
+    private readonly IValidator<EventPosition> _eventPositionValidator;
+    private readonly IValidator<EventRegistration> _eventRegistrationValidator;
 
-    public EventsController(IEmailService emailService, ILoggingService loggingService)
+    public EventsController(IEmailService emailService, ILoggingService loggingService, IValidator<Event> eventValidator,
+        IValidator<EventPosition> eventPositionValidator, IValidator<EventRegistration> eventRegistrationValidator)
     {
         _emailService = emailService;
         _loggingService = loggingService;
+        _eventValidator = eventValidator;
+        _eventPositionValidator = eventPositionValidator;
+        _eventRegistrationValidator = eventRegistrationValidator;
     }
 
     [HttpGet]
@@ -26,8 +35,7 @@ public class EventsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(CreateEventRegistration), ex.Message,
-                ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(CreateEventRegistration), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 }

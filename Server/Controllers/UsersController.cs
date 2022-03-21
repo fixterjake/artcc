@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetUsers), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(GetUsers), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -58,7 +58,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetUser), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(GetUser), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -73,7 +73,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetRoles), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(GetRoles), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -98,7 +98,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(UpdateUser), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(UpdateUser), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -123,7 +123,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(AddRole), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(AddRole), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -148,7 +148,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(RemoveRole), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(RemoveRole), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -173,7 +173,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(DeleteUser), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(DeleteUser), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 }

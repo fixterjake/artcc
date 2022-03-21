@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -9,7 +10,10 @@ using ZDC.Server.Repositories;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Server.Services;
 using ZDC.Server.Services.Interfaces;
+using ZDC.Server.Validators;
 using ZDC.Shared;
+using ZDC.Shared.Models;
+using File = ZDC.Shared.Models.File;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +21,7 @@ builder.Logging.ClearProviders();
 var logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
-builder.Logging.AddSerilog(logger);
+builder.Logging.AddSerilog(logger, dispose: true);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -47,9 +51,24 @@ builder.Services.AddSwaggerGen(c =>
     }
 );
 
-
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString")));
+
+builder.Services.AddTransient<IValidator<Airport>, AirportValidator>();
+builder.Services.AddTransient<IValidator<Comment>, CommentValidator>();
+builder.Services.AddTransient<IValidator<EventPosition>, EventPositionValidator>();
+builder.Services.AddTransient<IValidator<EventRegistration>, EventRegistrationValidator>();
+builder.Services.AddTransient<IValidator<Event>, EventValidator>();
+builder.Services.AddTransient<IValidator<Feedback>, FeedbackValidator>();
+builder.Services.AddTransient<IValidator<File>, FileValidator>();
+builder.Services.AddTransient<IValidator<Loa>, LoaValidator>();
+builder.Services.AddTransient<IValidator<News>, NewsValidator>();
+builder.Services.AddTransient<IValidator<Position>, PositionValidator>();
+builder.Services.AddTransient<IValidator<Settings>, SettingsValidator>();
+builder.Services.AddTransient<IValidator<SoloCert>, SoloCertValidator>();
+builder.Services.AddTransient<IValidator<StaffingRequest>, StaffingRequestValidator>();
+builder.Services.AddTransient<IValidator<TrainingTicket>, TrainingTicketValidator>();
+builder.Services.AddTransient<IValidator<VisitRequest>, VisitRequestValidator>();
 
 builder.Services.AddAutoMapper(typeof(AutomapperConfig));
 
@@ -61,6 +80,7 @@ builder.Services.AddTransient<IAirportRepository, AirportRepository>();
 builder.Services.AddTransient<ICommentRepository, CommentRepository>();
 builder.Services.AddTransient<IControllerLogRepository, ControllerLogRepository>();
 builder.Services.AddTransient<IDebugLogRepository, DebugLogRepository>();
+builder.Services.AddTransient<IEmailLogRepository, EmailLogRepository>();
 
 builder.Services.AddSystemMetrics();
 

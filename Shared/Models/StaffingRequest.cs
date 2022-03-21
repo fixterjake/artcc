@@ -3,16 +3,16 @@
 public class StaffingRequest
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public string Affiliation { get; set; }
-    public string Description { get; set; }
-    public DateTime Start { get; set; }
-    public DateTime End { get; set; }
-    public DateTime Timestamp { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Affiliation { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public DateTimeOffset Start { get; set; }
+    public DateTimeOffset End { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 
     public StaffingRequest()
     {
-        Timestamp = DateTime.UtcNow;
+        Timestamp = DateTimeOffset.UtcNow;
     }
 }

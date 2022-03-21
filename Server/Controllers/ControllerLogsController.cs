@@ -43,7 +43,7 @@ public class ControllerLogsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetUserControllerLogs), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(GetUserControllerLogs), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 }

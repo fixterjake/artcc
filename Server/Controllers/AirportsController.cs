@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using ZDC.Server.Repositories.Interfaces;
@@ -15,11 +17,13 @@ public class AirportsController : ControllerBase
 {
     private readonly IAirportRepository _airportRepository;
     private readonly ILoggingService _loggingService;
+    private readonly IValidator<Airport> _validator;
 
-    public AirportsController(IAirportRepository airportRepository, ILoggingService loggingService)
+    public AirportsController(IAirportRepository airportRepository, ILoggingService loggingService, IValidator<Airport> validator)
     {
         _airportRepository = airportRepository;
         _loggingService = loggingService;
+        _validator = validator;
     }
 
     [HttpPost]
@@ -29,11 +33,21 @@ public class AirportsController : ControllerBase
     {
         try
         {
+            var result = await _validator.ValidateAsync(airport);
+            if (!result.IsValid)
+            {
+                return BadRequest(new Response<IList<ValidationFailure>>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Message = "Validation error",
+                    Data = result.Errors
+                });
+            }
             return Ok(await _airportRepository.CreateAirport(airport, Request));
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(CreateAirport), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(CreateAirport), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -48,7 +62,7 @@ public class AirportsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetAirports), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(GetAirports), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -73,7 +87,7 @@ public class AirportsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetAirport), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(GetAirport), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -85,6 +99,16 @@ public class AirportsController : ControllerBase
     {
         try
         {
+            var result = await _validator.ValidateAsync(airport);
+            if (!result.IsValid)
+            {
+                return BadRequest(new Response<IList<ValidationFailure>>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Message = "Validation error",
+                    Data = result.Errors
+                });
+            }
             return Ok(await _airportRepository.UpdateAirport(airport, Request));
         }
         catch (AirportNotFoundException ex)
@@ -98,7 +122,7 @@ public class AirportsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(UpdateAirport), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(UpdateAirport), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 
@@ -123,7 +147,7 @@ public class AirportsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(DeleteAirport), ex.Message, ex.StackTrace);
+            return await _loggingService.AddDebugLog(Request, nameof(DeleteAirport), ex.Message, ex.StackTrace ?? "N/A");
         }
     }
 }

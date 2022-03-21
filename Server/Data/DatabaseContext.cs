@@ -10,6 +10,8 @@ public class DatabaseContext : DbContext
     {
     }
 
+#nullable disable
+
     public DbSet<Airport> Airports { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<ControllerLog> ControllerLogs { get; set; }
@@ -37,4 +39,6 @@ public class DatabaseContext : DbContext
     public DbSet<VisitRequest> VisitRequests { get; set; }
     public DbSet<Warning> Warnings { get; set; }
     public DbSet<WebsiteLog> WebsiteLogs { get; set; }
+
+#nullable restore
 }
