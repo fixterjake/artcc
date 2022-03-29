@@ -20,7 +20,6 @@ public class StatsRepository : IStatsRepository
 
     public async Task<IList<StatsDto>> GetStats(int month, int year)
     {
-        throw new Exception("This is a test");
         var results = new List<StatsDto>();
         var users = await _context.Users
             .Where(x => x.Status != UserStatus.Removed)
