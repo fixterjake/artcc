@@ -1,11 +1,14 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
 using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
+using User = ZDC.Shared.Models.User;
 
 namespace ZDC.Server.Controllers;
 
@@ -14,13 +17,15 @@ namespace ZDC.Server.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
-    private readonly ILoggingService _loggingService;
+    private readonly IHub _sentryHub;
 
-    public UsersController(IUserRepository userRepository, ILoggingService loggingService)
+    public UsersController(IUserRepository userRepository, IHub sentryHub)
     {
         _userRepository = userRepository;
-        _loggingService = loggingService;
+        _sentryHub = sentryHub;
     }
+
+    #region Read
 
     [HttpGet]
     [SwaggerResponse(200, "Got all users", typeof(Response<IList<UserDto>>))]
@@ -33,19 +38,19 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetUsers), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{userId:int}")]
     [SwaggerResponse(200, "Got user", typeof(Response<User>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<User>>> GetUser(int id)
+    public async Task<ActionResult<Response<User>>> GetUser(int userId)
     {
         try
         {
-            return Ok(await _userRepository.GetUser(id));
+            return Ok(await _userRepository.GetUser(userId));
         }
         catch (UserNotFoundException ex)
         {
@@ -58,11 +63,12 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetUser), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
     [HttpGet("roles")]
+    // todo auth
     [SwaggerResponse(200, "Got all roles", typeof(Response<IList<Role>>))]
     [SwaggerResponse(400, "An error occurred")]
     public async Task<ActionResult<Response<IList<Role>>>> GetRoles()
@@ -73,11 +79,16 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetRoles), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
+    #endregion
+
+    #region Update
+
     [HttpPut]
+    // todo auth
     [SwaggerResponse(200, "Updated user", typeof(Response<User>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
@@ -98,19 +109,20 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(UpdateUser), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
-    [HttpPut("role")]
+    [HttpPut("role/{userId:int}/{roleId:int}")]
+    // todo auth
     [SwaggerResponse(200, "Added role", typeof(Response<User>))]
     [SwaggerResponse(404, "User or role not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<User>>> AddRole(int id, int roleId)
+    public async Task<ActionResult<Response<User>>> AddRole(int userId, int roleId)
     {
         try
         {
-            return Ok(await _userRepository.AddRole(id, roleId, Request));
+            return Ok(await _userRepository.AddRole(userId, roleId, Request));
         }
         catch (UserNotFoundException ex)
         {
@@ -123,19 +135,20 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(AddRole), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
-    [HttpDelete("role")]
+    [HttpDelete("role{userId:int}/{roleId:int}")]
+    // todo auth
     [SwaggerResponse(200, "Removed role", typeof(Response<User>))]
     [SwaggerResponse(404, "User or role not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<User>>> RemoveRole(int id, int roleId)
+    public async Task<ActionResult<Response<User>>> RemoveRole(int userId, int roleId)
     {
         try
         {
-            return Ok(await _userRepository.RemoveRole(id, roleId, Request));
+            return Ok(await _userRepository.RemoveRole(userId, roleId, Request));
         }
         catch (UserNotFoundException ex)
         {
@@ -148,19 +161,24 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(RemoveRole), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
-    [HttpDelete("{id:int}")]
+    #endregion
+
+    #region Delete
+
+    [HttpDelete("{userId:int}")]
+    // todo auth
     [SwaggerResponse(200, "Removed user", typeof(Response<User>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<User>>> DeleteUser(int id)
+    public async Task<ActionResult<Response<User>>> DeleteUser(int userId)
     {
         try
         {
-            return Ok(await _userRepository.DeleteUser(id, Request));
+            return Ok(await _userRepository.DeleteUser(userId, Request));
         }
         catch (UserNotFoundException ex)
         {
@@ -173,7 +191,9 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(DeleteUser), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
+
+    #endregion
 }

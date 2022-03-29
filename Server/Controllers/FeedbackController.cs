@@ -1,10 +1,11 @@
-﻿using System.Net;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using ZDC.Server.Extensions;
+using ZDC.Server.Repositories;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
@@ -15,15 +16,15 @@ namespace ZDC.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AirportsController : ControllerBase
+public class FeedbackController : ControllerBase
 {
-    private readonly IAirportRepository _airportRepository;
-    private readonly IValidator<Airport> _validator;
+    private readonly IFeedbackRepository _feedbackRepository;
+    private readonly IValidator<Feedback> _validator;
     private readonly IHub _sentryHub;
 
-    public AirportsController(IAirportRepository airportRepository, IValidator<Airport> validator, IHub sentryHub)
+    public FeedbackController(IFeedbackRepository feedbackRepository, IValidator<Feedback> validator, IHub sentryHub)
     {
-        _airportRepository = airportRepository;
+        _feedbackRepository = feedbackRepository;
         _validator = validator;
         _sentryHub = sentryHub;
     }
@@ -32,13 +33,13 @@ public class AirportsController : ControllerBase
 
     [HttpPost]
     // todo auth
-    [SwaggerResponse(200, "Created airport", typeof(Response<Airport>))]
+    [SwaggerResponse(200, "Created feedback", typeof(Response<string>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Airport>>> CreateAirport([FromBody] Airport airport)
+    public async Task<ActionResult<Response<string>>> CreateFeedback([FromBody] Feedback feedback)
     {
         try
         {
-            var result = await _validator.ValidateAsync(airport);
+            var result = await _validator.ValidateAsync(feedback);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -48,7 +49,7 @@ public class AirportsController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _airportRepository.CreateAirport(airport, Request));
+            return Ok(await _feedbackRepository.CreateFeedback(feedback, Request));
         }
         catch (Exception ex)
         {
@@ -61,13 +62,14 @@ public class AirportsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all airports", typeof(Response<IList<Airport>>))]
+    // todo auth
+    [SwaggerResponse(200, "Got all feedback", typeof(Response<IList<Feedback>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Airport>>>> GetAirports()
+    public async Task<ActionResult<Response<IList<Feedback>>>> GetFeedback()
     {
         try
         {
-            return Ok(await _airportRepository.GetAirports());
+            return Ok(await _feedbackRepository.GetFeedback());
         }
         catch (Exception ex)
         {
@@ -75,17 +77,19 @@ public class AirportsController : ControllerBase
         }
     }
 
-    [HttpGet("{airportId:int}")]
-    [SwaggerResponse(200, "Got airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
+
+    [HttpGet("{feedbackId:int}")]
+    // todo auth
+    [SwaggerResponse(200, "Got feedback", typeof(Response<Feedback>))]
+    [SwaggerResponse(404, "Feedback not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Airport>>> GetAirport(int airportId)
+    public async Task<ActionResult<Response<IList<Feedback>>>> GetFeedback(int feedbackId)
     {
         try
         {
-            return Ok(await _airportRepository.GetAirport(airportId));
+            return Ok(await _feedbackRepository.GetFeedback(feedbackId));
         }
-        catch (AirportNotFoundException ex)
+        catch (FeedbackNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -106,14 +110,14 @@ public class AirportsController : ControllerBase
 
     [HttpPut]
     // todo auth
-    [SwaggerResponse(200, "Updated airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
+    [SwaggerResponse(200, "Updated feedback", typeof(Response<Feedback>))]
+    [SwaggerResponse(404, "Feedback not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Airport>>> UpdateAirport([FromBody] Airport airport)
+    public async Task<ActionResult<Response<Feedback>>> UpdateFeedback([FromBody] Feedback feedback)
     {
         try
         {
-            var result = await _validator.ValidateAsync(airport);
+            var result = await _validator.ValidateAsync(feedback);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -123,9 +127,9 @@ public class AirportsController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _airportRepository.UpdateAirport(airport, Request));
+            return Ok(await _feedbackRepository.UpdateFeedback(feedback, Request));
         }
-        catch (AirportNotFoundException ex)
+        catch (FeedbackNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -144,18 +148,18 @@ public class AirportsController : ControllerBase
 
     #region Delete
 
-    [HttpDelete("{airportId:int}")]
+    [HttpDelete("{feedbackId:int}")]
     // todo auth
-    [SwaggerResponse(200, "Deleted airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
+    [SwaggerResponse(200, "Deleted feedback", typeof(Response<Feedback>))]
+    [SwaggerResponse(404, "Feedback not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Airport>>> DeleteAirport(int airportId)
+    public async Task<ActionResult<Response<Feedback>>> DeleteFeedback(int feedbackId)
     {
         try
         {
-            return Ok(await _airportRepository.DeleteAirport(airportId, Request));
+            return Ok(await _feedbackRepository.DeleteFeedback(feedbackId, Request));
         }
-        catch (AirportNotFoundException ex)
+        catch (FeedbackNotFoundException ex)
         {
             return NotFound(new Response<string>
             {

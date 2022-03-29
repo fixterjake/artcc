@@ -14,6 +14,29 @@ public class User
     public bool Visitor { get; set; }
     public string? VisitorFrom { get; set; }
     public Rating Rating { get; set; }
+    public string RatingLong
+    {
+        get
+        {
+            return Rating switch
+            {
+                Rating.INAC => "Inactive",
+                Rating.OBS => "Observer",
+                Rating.S1 => "Student",
+                Rating.S2 => "Student 2",
+                Rating.S3 => "Student 3",
+                Rating.C1 => "Controller",
+                Rating.C2 => "Controller 2",
+                Rating.C3 => "Senior Controller",
+                Rating.I1 => "Instructor",
+                Rating.I2 => "Instructor 2",
+                Rating.I3 => "Senior Instructor",
+                Rating.SUP => "Supervisor",
+                Rating.ADM => "Administrator",
+                _ => "None"
+            };
+        }
+    }
     public AirportCert Minor { get; set; }
     public AirportCert Iad { get; set; }
     public AirportCert Dca { get; set; }

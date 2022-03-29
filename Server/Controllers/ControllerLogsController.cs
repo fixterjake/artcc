@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
@@ -14,23 +16,23 @@ namespace ZDC.Server.Controllers;
 public class ControllerLogsController : ControllerBase
 {
     private readonly IControllerLogRepository _controllerLogRepository;
-    private readonly ILoggingService _loggingService;
+    private readonly IHub _sentryHub;
 
-    public ControllerLogsController(IControllerLogRepository controllerLogRepository, ILoggingService loggingService)
+    public ControllerLogsController(IControllerLogRepository controllerLogRepository, IHub sentryHub)
     {
         _controllerLogRepository = controllerLogRepository;
-        _loggingService = loggingService;
+        _sentryHub = sentryHub;
     }
 
-    [HttpGet("{id:int}")]
-    [SwaggerResponse(200, "Got user controller logs", typeof(Response<IList<ControllerLog>>))]
+    [HttpGet("{userId:int}")]
+    [SwaggerResponse(200, "Got user controller logs", typeof(Response<IList<ControllerLogDto>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Comment>>>> GetUserControllerLogs(int id)
+    public async Task<ActionResult<Response<IList<ControllerLogDto>>>> GetUserControllerLogs(int userId)
     {
         try
         {
-            return Ok(await _controllerLogRepository.GetUserControllerLogs(id));
+            return Ok(await _controllerLogRepository.GetUserControllerLogs(userId));
         }
         catch (UserNotFoundException ex)
         {
@@ -43,7 +45,7 @@ public class ControllerLogsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetUserControllerLogs), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 }

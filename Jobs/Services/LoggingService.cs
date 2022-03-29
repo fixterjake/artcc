@@ -25,18 +25,4 @@ public class LoggingService : ILoggingService
         });
         await _context.SaveChangesAsync();
     }
-
-    public async Task AddDebugLog(string exception, string stackTrace)
-    {
-        var result = await _context.DebugLogs.AddAsync(new DebugLog
-        {
-            Ip = "N/A",
-            Cid = "N/A",
-            Name = "SYSTEM",
-            Route = "N/A",
-            Exception = exception,
-            StackTrace = stackTrace
-        });
-        await _context.SaveChangesAsync();
-    }
 }

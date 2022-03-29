@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Quartz;
+using Sentry;
 using ZDC.Jobs.Models;
 using ZDC.Jobs.Services;
 using ZDC.Jobs.Services.Interfaces;
 using ZDC.Shared.Models;
+using User = ZDC.Shared.Models.User;
 
 namespace ZDC.Jobs.Jobs;
 
@@ -51,7 +53,7 @@ public class RosterJob : IJob
         }
         catch (Exception ex)
         {
-            await _loggingService.AddDebugLog(ex.Message, ex.StackTrace ?? "N/A");
+            SentrySdk.CaptureException(ex);
         }
     }
 

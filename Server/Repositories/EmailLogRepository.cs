@@ -15,8 +15,12 @@ public class EmailLogRepository : IEmailLogRepository
         _context = context;
     }
 
+    #region Read
+
     public async Task<IList<EmailLog>> GetEmailLogs(int skip, int take)
     {
         return await _context.EmailLogs.Skip(skip).Take(take).ToListAsync();
     }
+
+    #endregion
 }

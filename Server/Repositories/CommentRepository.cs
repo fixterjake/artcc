@@ -21,6 +21,8 @@ public class CommentRepository : ICommentRepository
         _loggingService = loggingService;
     }
 
+    #region Create
+
     public async Task<Response<Comment>> CreateComment(Comment comment, HttpRequest request)
     {
         var result = await _context.Comments.AddAsync(comment);
@@ -31,18 +33,22 @@ public class CommentRepository : ICommentRepository
 
         return new Response<Comment>
         {
-            StatusCode = HttpStatusCode.OK,
+            StatusCode = HttpStatusCode.Created,
             Message = $"Created comment '{result.Entity.Id}'",
             Data = result.Entity
         };
     }
 
-    public async Task<Response<IList<Comment>>> GetUserComments(int id)
-    {
-        if (!_context.Users.Any(x => x.Id == id))
-            throw new UserNotFoundException($"User '{id}' not found");
+    #endregion
 
-        var comments = await _context.Comments.Where(x => x.UserId == id).ToListAsync();
+    #region Read
+
+    public async Task<Response<IList<Comment>>> GetUserComments(int userId)
+    {
+        if (!_context.Users.Any(x => x.Id == userId))
+            throw new UserNotFoundException($"User '{userId}' not found");
+
+        var comments = await _context.Comments.Where(x => x.UserId == userId).ToListAsync();
         return new Response<IList<Comment>>
         {
             StatusCode = HttpStatusCode.OK,
@@ -51,10 +57,14 @@ public class CommentRepository : ICommentRepository
         };
     }
 
+    #endregion
+
+    #region Update
+
     public async Task<Response<Comment>> UpdateComment(Comment comment, HttpRequest request)
     {
         var dbComment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == comment.Id) ??
-                        throw new CommentNotFoundException($"Comment '{comment.Id}' not found");
+            throw new CommentNotFoundException($"Comment '{comment.Id}' not found");
         if (!_context.Users.Any(x => x.Id == dbComment.UserId))
             throw new UserNotFoundException($"User '{comment.UserId}' not found");
         if (!_context.Users.Any(x => x.Id == dbComment.SubmitterId))
@@ -75,22 +85,29 @@ public class CommentRepository : ICommentRepository
         };
     }
 
-    public async Task<Response<Comment>> DeleteComment(int id, HttpRequest request)
+
+    #endregion
+
+    #region Delete
+
+    public async Task<Response<Comment>> DeleteComment(int commentId, HttpRequest request)
     {
-        var comment = await _context.Comments.FindAsync(id) ??
-                      throw new CommentNotFoundException($"Comment '{id}' not found");
+        var comment = await _context.Comments.FindAsync(commentId) ??
+            throw new CommentNotFoundException($"Comment '{commentId}' not found");
 
         var oldData = JsonConvert.SerializeObject(comment);
         _context.Comments.Remove(comment);
         await _context.SaveChangesAsync();
 
-        await _loggingService.AddWebsiteLog(request, $"Deleted comment '{id}'", oldData, string.Empty);
+        await _loggingService.AddWebsiteLog(request, $"Deleted comment '{commentId}'", oldData, string.Empty);
 
         return new Response<Comment>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Deleted comment '{id}'",
+            Message = $"Deleted comment '{commentId}'",
             Data = comment
         };
     }
+
+    #endregion
 }

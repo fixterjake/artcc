@@ -24,6 +24,8 @@ public class UserRepository : IUserRepository
         _mapper = mapper;
     }
 
+    #region Create
+
     public async Task<Response<User>> CreateUser(User user, HttpRequest request)
     {
         var result = await _context.AddAsync(user);
@@ -40,6 +42,10 @@ public class UserRepository : IUserRepository
         };
     }
 
+    #endregion
+
+    #region Read
+
     public async Task<Response<IList<UserDto>>> GetUsers()
     {
         var result = await _context.Users.ToListAsync();
@@ -52,16 +58,16 @@ public class UserRepository : IUserRepository
         };
     }
 
-    public async Task<Response<User>> GetUser(int id)
+    public async Task<Response<User>> GetUser(int userId)
     {
         var user = await _context.Users
-                       .Include(x => x.Roles)
-                       .FirstOrDefaultAsync(x => x.Id == id) ??
-                   throw new UserNotFoundException($"User '{id}' not found");
+            .Include(x => x.Roles)
+            .FirstOrDefaultAsync(x => x.Id == userId) ??
+            throw new UserNotFoundException($"User '{userId}' not found");
         return new Response<User>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got user '{id}'",
+            Message = $"Got user '{userId}'",
             Data = user
         };
     }
@@ -77,10 +83,14 @@ public class UserRepository : IUserRepository
         };
     }
 
+    #endregion
+
+    #region Update
+
     public async Task<Response<User>> UpdateUser(User user, HttpRequest request)
     {
         var dbUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == user.Id) ??
-                     throw new UserNotFoundException($"User '{user.Id}' not found");
+            throw new UserNotFoundException($"User '{user.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbUser);
         var result = _context.Users.Update(user);
@@ -97,71 +107,77 @@ public class UserRepository : IUserRepository
         };
     }
 
-    public async Task<Response<User>> AddRole(int id, int roleId, HttpRequest request)
+    public async Task<Response<User>> AddRole(int userId, int roleId, HttpRequest request)
     {
         var user = await _context.Users
-                       .Include(x => x.Roles)
-                       .FirstOrDefaultAsync(x => x.Id == id) ??
-                   throw new UserNotFoundException($"User '{id}' not found");
+            .Include(x => x.Roles)
+            .FirstOrDefaultAsync(x => x.Id == userId) ??
+            throw new UserNotFoundException($"User '{userId}' not found");
         var role = await _context.Roles.FindAsync(roleId) ??
-                   throw new RoleNotFoundException($"Role '{roleId}' not found");
+            throw new RoleNotFoundException($"Role '{roleId}' not found");
 
         var oldData = JsonConvert.SerializeObject(user.Roles);
         user.Roles?.Add(role);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(user.Roles);
 
-        await _loggingService.AddWebsiteLog(request, $"Added role '{roleId}' to user '{id}'", oldData, newData);
+        await _loggingService.AddWebsiteLog(request, $"Added role '{roleId}' to user '{userId}'", oldData, newData);
 
         return new Response<User>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Added role '{roleId}' to user '{id}'",
+            Message = $"Added role '{roleId}' to user '{userId}'",
             Data = user
         };
     }
 
-    public async Task<Response<User>> RemoveRole(int id, int roleId, HttpRequest request)
+    public async Task<Response<User>> RemoveRole(int userId, int roleId, HttpRequest request)
     {
         var user = await _context.Users
-                       .Include(x => x.Roles)
-                       .FirstOrDefaultAsync(x => x.Id == id) ??
-                   throw new UserNotFoundException($"User '{id}' not found");
+            .Include(x => x.Roles)
+            .FirstOrDefaultAsync(x => x.Id == userId) ??
+            throw new UserNotFoundException($"User '{userId}' not found");
         var role = await _context.Roles.FindAsync(roleId) ??
-                   throw new RoleNotFoundException($"Role '{roleId}' not found");
+            throw new RoleNotFoundException($"Role '{roleId}' not found");
 
         var oldData = JsonConvert.SerializeObject(user.Roles);
         user.Roles?.Remove(role);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(user.Roles);
 
-        await _loggingService.AddWebsiteLog(request, $"Added role '{roleId}' to user '{id}'", oldData, newData);
+        await _loggingService.AddWebsiteLog(request, $"Added role '{roleId}' to user '{userId}'", oldData, newData);
 
         return new Response<User>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Added role '{roleId}' to user '{id}'",
+            Message = $"Added role '{roleId}' to user '{userId}'",
             Data = user
         };
     }
 
-    public async Task<Response<User>> DeleteUser(int id, HttpRequest request)
+    #endregion
+
+    #region Delete
+
+    public async Task<Response<User>> DeleteUser(int userId, HttpRequest request)
     {
-        var user = await _context.Users.FindAsync(id) ??
-                   throw new UserNotFoundException($"User '{id}' not found");
+        var user = await _context.Users.FindAsync(userId) ??
+            throw new UserNotFoundException($"User '{userId}' not found");
 
         var oldData = JsonConvert.SerializeObject(user);
         user.Status = UserStatus.Removed;
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(user);
 
-        await _loggingService.AddWebsiteLog(request, $"Removed user '{id}'", oldData, newData);
+        await _loggingService.AddWebsiteLog(request, $"Removed user '{userId}'", oldData, newData);
 
         return new Response<User>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Removed user '{id}'",
+            Message = $"Removed user '{userId}'",
             Data = user
         };
     }
+
+    #endregion
 }

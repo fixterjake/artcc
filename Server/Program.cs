@@ -17,6 +17,8 @@ using File = ZDC.Shared.Models.File;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseSentry();
+
 builder.Logging.ClearProviders();
 var logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -75,16 +77,23 @@ builder.Services.AddAutoMapper(typeof(AutomapperConfig));
 builder.Services.AddTransient<ILoggingService, LoggingService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 
-builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IAirportRepository, AirportRepository>();
 builder.Services.AddTransient<ICommentRepository, CommentRepository>();
 builder.Services.AddTransient<IControllerLogRepository, ControllerLogRepository>();
-builder.Services.AddTransient<IDebugLogRepository, DebugLogRepository>();
 builder.Services.AddTransient<IEmailLogRepository, EmailLogRepository>();
+builder.Services.AddTransient<IEventRepository, EventRepository>();
+builder.Services.AddTransient<IFeedbackRepository, FeedbackRepository>();
+builder.Services.AddTransient<IFileRepository, FileRepository>();
+builder.Services.AddTransient<IStatsRepository, StatsRepository>();
+builder.Services.AddTransient<ILoaRepository, LoaRepository>();
+
+builder.Services.AddTransient<IUserRepository, UserRepository>();
 
 builder.Services.AddSystemMetrics();
 
 var app = builder.Build();
+
+app.UseSentryTracing();
 
 using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
 {

@@ -1,36 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using ZDC.Server.Data;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Server.Services.Interfaces;
 using ZDC.Shared.Dtos;
-using ZDC.Shared.Models;
 
 namespace ZDC.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EmailLogsController : ControllerBase
+public class StatsController : ControllerBase
 {
-    private readonly IEmailLogRepository _emailLogRepository;
+    private readonly IStatsRepository _statsRepository;
     private readonly IHub _sentryHub;
 
-    public EmailLogsController(IEmailLogRepository emailLogRepository, IHub sentryHub)
+    public StatsController(IStatsRepository statsRepository, IHub sentryHub)
     {
-        _emailLogRepository = emailLogRepository;
+        _statsRepository = statsRepository;
         _sentryHub = sentryHub;
     }
 
     [HttpGet]
-    // todo auth
-    [SwaggerResponse(200, "Got all email logs", typeof(Response<IList<EmailLog>>))]
+    [SwaggerResponse(200, "Got stats", typeof(Response<IList<StatsDto>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<IList<EmailLog>>> GetEmailLogs(int skip = 0, int take = 100)
+    public async Task<ActionResult<IList<StatsDto>>> GetStats(int month, int year)
     {
         try
         {
-            return Ok(await _emailLogRepository.GetEmailLogs(skip, take));
+            return Ok(await _statsRepository.GetStats(month, year));
         }
         catch (Exception ex)
         {

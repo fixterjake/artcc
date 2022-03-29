@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using Sentry;
 using Serilog;
 using ZDC.Jobs;
 using ZDC.Jobs.Services;
@@ -25,7 +26,6 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddTransient<IJobsService, JobsService>();
         services.AddTransient<IAvwxService, AvwxService>();
     })
-
     .Build();
 
 var scope = host.Services.CreateScope();
@@ -37,4 +37,11 @@ jobs.AddAirportsJob(TimeSpan.FromSeconds(20), 5);
 jobs.AddEventEmailsJob(TimeSpan.FromSeconds(30), 30);
 jobs.StartJobs();
 
-await host.RunAsync();
+
+using (SentrySdk.Init(o =>
+{
+    o.Dsn = scope.ServiceProvider.GetRequiredService<IConfiguration>().GetValue<string>("SentryDsn");
+}))
+{
+    await host.RunAsync();
+}

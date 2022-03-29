@@ -7,7 +7,7 @@ public interface IAirportRepository
 {
     Task<Response<Airport>> CreateAirport(Airport airport, HttpRequest request);
     Task<Response<IList<Airport>>> GetAirports();
-    Task<Response<Airport>> GetAirport(int id);
+    Task<Response<Airport>> GetAirport(int airportId);
     Task<Response<Airport>> UpdateAirport(Airport airport, HttpRequest request);
-    Task<Response<Airport>> DeleteAirport(int id, HttpRequest request);
+    Task<Response<Airport>> DeleteAirport(int airportId, HttpRequest request);
 }

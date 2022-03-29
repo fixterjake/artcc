@@ -15,7 +15,6 @@ public class DatabaseContext : DbContext
     public DbSet<Airport> Airports { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<ControllerLog> ControllerLogs { get; set; }
-    public DbSet<DebugLog> DebugLogs { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<EventPosition> EventsPositions { get; set; }

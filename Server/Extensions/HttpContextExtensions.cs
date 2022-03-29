@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Amazon.Runtime.Internal;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 using ZDC.Server.Data;
 using ZDC.Shared.Models;
 
@@ -31,5 +33,46 @@ public static class HttpContextExtensions
             .Include(x => x.Roles)
             .FirstOrDefaultAsync(x => x.Id == cid);
         return user;
+    }
+
+    public static async Task<EventRegistration?> GetUserEventRegistration(this HttpContext httpContext, DatabaseContext context, int eventId)
+    {
+        var user = await httpContext.GetUser(context);
+        if (user == null)
+            return null;
+
+        var registration = await context.EventsRegistrations
+            .Where(x => x.Id == eventId)
+            .FirstOrDefaultAsync(x => x.UserId == user.Id);
+        return registration;
+    }
+
+    public static async Task<bool> IsStaff(this HttpContext httpContext, DatabaseContext context)
+    {
+        var user = await httpContext.GetUser(context);
+        if (user == null)
+            return false;
+
+        return await context.Roles.Select(x => x.Name)
+            .AnyAsync(x =>
+                x == "ATM" || x == "DATM" || x == "TA" ||
+                x == "ATA" || x == "WM" || x == "AWM" ||
+                x == "EC" || x == "AEC" || x == "FE" ||
+                x == "AFE" || x == "WEB" || x == "EVENTS"
+            );
+    }
+
+    public static async Task<bool> IsTrainingStaff(this HttpContext httpContext, DatabaseContext context)
+    {
+        var user = await httpContext.GetUser(context);
+        if (user == null)
+            return false;
+
+        return await context.Roles.Select(x => x.Name)
+            .AnyAsync(x =>
+                x == "ATM" || x == "DATM" || x == "TA" ||
+                x == "ATA" || x == "WM" || x == "AWM" ||
+                x == "INS" || x == "MTR"
+            );
     }
 }

@@ -2,7 +2,9 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
@@ -16,17 +18,20 @@ namespace ZDC.Server.Controllers;
 public class CommentsController : ControllerBase
 {
     private readonly ICommentRepository _commentRepository;
-    private readonly ILoggingService _loggingService;
     private readonly IValidator<Comment> _validator;
+    private readonly IHub _sentryHub;
 
-    public CommentsController(ICommentRepository commentRepository, ILoggingService loggingService, IValidator<Comment> validator)
+    public CommentsController(ICommentRepository commentRepository, IValidator<Comment> validator, IHub sentryHub)
     {
         _commentRepository = commentRepository;
-        _loggingService = loggingService;
         _validator = validator;
+        _sentryHub = sentryHub;
     }
 
+    #region Create
+
     [HttpPost]
+    // todo auth
     [SwaggerResponse(200, "Created comment", typeof(Response<Comment>))]
     [SwaggerResponse(400, "An error occurred")]
     public async Task<ActionResult<Response<Comment>>> CreateComment([FromBody] Comment comment)
@@ -47,19 +52,24 @@ public class CommentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(CreateComment), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
-    [HttpGet("{id:int}")]
+    #endregion
+
+    #region Read
+
+    [HttpGet("{userId:int}")]
+    // todo auth
     [SwaggerResponse(200, "Got user comments", typeof(Response<IList<Comment>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Comment>>>> GetUserComments(int id)
+    public async Task<ActionResult<Response<IList<Comment>>>> GetUserComments(int userId)
     {
         try
         {
-            return Ok(await _commentRepository.GetUserComments(id));
+            return Ok(await _commentRepository.GetUserComments(userId));
         }
         catch (AirportNotFoundException ex)
         {
@@ -72,11 +82,16 @@ public class CommentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(GetUserComments), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
+    #endregion
+
+    #region Update
+
     [HttpPut]
+    // todo auth
     [SwaggerResponse(200, "Updated comment", typeof(Response<Comment>))]
     [SwaggerResponse(404, "Comment or user not found")]
     [SwaggerResponse(400, "An error occurred")]
@@ -107,19 +122,24 @@ public class CommentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(UpdateComment), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
 
-    [HttpDelete("{id:int}")]
+    #endregion
+
+    #region Delete
+
+    [HttpDelete("{commentId:int}")]
+    // todo auth
     [SwaggerResponse(200, "Deleted comment", typeof(Response<Comment>))]
     [SwaggerResponse(404, "Comment not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Comment>>> DeleteComment(int id)
+    public async Task<ActionResult<Response<Comment>>> DeleteComment(int commentId)
     {
         try
         {
-            return Ok(await _commentRepository.DeleteComment(id, Request));
+            return Ok(await _commentRepository.DeleteComment(commentId, Request));
         }
         catch (AirportNotFoundException ex)
         {
@@ -132,7 +152,9 @@ public class CommentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return await _loggingService.AddDebugLog(Request, nameof(DeleteComment), ex.Message, ex.StackTrace ?? "N/A");
+            return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
+
+    #endregion
 }

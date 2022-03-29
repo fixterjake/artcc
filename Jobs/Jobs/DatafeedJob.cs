@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Quartz;
+using Sentry;
 using ZDC.Jobs.Models;
 using ZDC.Jobs.Services;
 using ZDC.Jobs.Services.Interfaces;
@@ -57,7 +58,7 @@ public class DatafeedJob : IJob
         }
         catch (Exception ex)
         {
-            await _loggingService.AddDebugLog(ex.Message, ex.StackTrace ?? "N/A");
+            SentrySdk.CaptureException(ex);
         }
     }
 

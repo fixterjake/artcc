@@ -69,6 +69,15 @@ public class EmailService : IEmailService
         return await SendEmail("EventPositionAssigned", to, "vZDC Events", "vZDC Event Position Assigned", template);
     }
 
+    public async Task<bool> SendEventPositionUnAssigned(string to, int eventId, string name, string position)
+    {
+        var template = await LoadEmailTemplate("EventPositionUnAssigned");
+        template = template.Replace("{Name}", name);
+        template = template.Replace("{Position}", position);
+        template = template.Replace("{Link}", $"https://vzdc.xyz/event/{eventId}");
+        return await SendEmail("EventPositionUnAssigned", to, "vZDC Events", "vZDC Event Position Unassigned", template);
+    }
+
     public async Task<bool> SendEventRegistrationSubmitted(string to, int eventId, string name, DateTimeOffset start, DateTimeOffset end)
     {
         var template = await LoadEmailTemplate("EventRegistrationSubmitted");

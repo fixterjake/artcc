@@ -5,6 +5,7 @@ public interface IEmailService
     Task<string> LoadEmailTemplate(string name);
     Task<bool> SendEmail(string type, string to, string fromName, string subject, string body);
     Task<bool> SendEventPositionAssigned(string to, int eventId, string name, string position, DateTimeOffset start, DateTimeOffset end);
+    Task<bool> SendEventPositionUnAssigned(string to, int eventId, string name, string position);
     Task<bool> SendEventRegistrationSubmitted(string to, int eventId, string name, DateTimeOffset start, DateTimeOffset end);
     Task<bool> SendEventRegistrationRemoved(string to, int eventId, string name);
     Task<bool> SendFeedbackApproved(string to, string position, string callsign, string comments, string staffComments);

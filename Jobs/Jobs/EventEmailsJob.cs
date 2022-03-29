@@ -2,6 +2,7 @@
 using ZDC.Jobs.Services.Interfaces;
 using ZDC.Jobs.Services;
 using Microsoft.EntityFrameworkCore;
+using Sentry;
 
 namespace ZDC.Jobs.Jobs;
 
@@ -61,7 +62,7 @@ public class EventEmailsJob : IJob
         }
         catch (Exception ex)
         {
-            await _loggingService.AddDebugLog(ex.Message, ex.StackTrace ?? "N/A");
+            SentrySdk.CaptureException(ex);
         }
     }
 }

@@ -7,10 +7,10 @@ public interface IUserRepository
 {
     Task<Response<User>> CreateUser(User user, HttpRequest request);
     Task<Response<IList<UserDto>>> GetUsers();
-    Task<Response<User>> GetUser(int id);
+    Task<Response<User>> GetUser(int userId);
     Task<Response<IList<Role>>> GetRoles();
     Task<Response<User>> UpdateUser(User user, HttpRequest request);
-    Task<Response<User>> AddRole(int id, int roleId, HttpRequest request);
-    Task<Response<User>> RemoveRole(int id, int roleId, HttpRequest request);
-    Task<Response<User>> DeleteUser(int id, HttpRequest request);
+    Task<Response<User>> AddRole(int userId, int roleId, HttpRequest request);
+    Task<Response<User>> RemoveRole(int userId, int roleId, HttpRequest request);
+    Task<Response<User>> DeleteUser(int userId, HttpRequest request);
 }

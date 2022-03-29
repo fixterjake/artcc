@@ -21,6 +21,8 @@ public class AirportRepository : IAirportRepository
         _loggingService = loggingService;
     }
 
+    #region Create
+
     public async Task<Response<Airport>> CreateAirport(Airport airport, HttpRequest request)
     {
         var result = await _context.AddAsync(airport);
@@ -37,6 +39,10 @@ public class AirportRepository : IAirportRepository
         };
     }
 
+    #endregion
+
+    #region Read
+
     public async Task<Response<IList<Airport>>> GetAirports()
     {
         var result = await _context.Airports.ToListAsync();
@@ -48,22 +54,26 @@ public class AirportRepository : IAirportRepository
         };
     }
 
-    public async Task<Response<Airport>> GetAirport(int id)
+    public async Task<Response<Airport>> GetAirport(int airportId)
     {
-        var result = await _context.Airports.FindAsync(id) ??
-                     throw new AirportNotFoundException($"Airport '{id}' not found");
+        var result = await _context.Airports.FindAsync(airportId) ??
+            throw new AirportNotFoundException($"Airport '{airportId}' not found");
         return new Response<Airport>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got airport '{id}'",
+            Message = $"Got airport '{airportId}'",
             Data = result
         };
     }
 
+    #endregion
+
+    #region Update
+
     public async Task<Response<Airport>> UpdateAirport(Airport airport, HttpRequest request)
     {
         var dbAirport = await _context.Airports.AsNoTracking().FirstOrDefaultAsync(x => x.Id == airport.Id) ??
-                        throw new AirportNotFoundException($"Airport '{airport.Id}' not found");
+            throw new AirportNotFoundException($"Airport '{airport.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbAirport);
         var result = _context.Airports.Update(airport);
@@ -74,27 +84,33 @@ public class AirportRepository : IAirportRepository
 
         return new Response<Airport>
         {
-            StatusCode = HttpStatusCode.Created,
+            StatusCode = HttpStatusCode.OK,
             Message = $"Updated airport '{result.Entity.Id}'",
             Data = result.Entity
         };
     }
 
-    public async Task<Response<Airport>> DeleteAirport(int id, HttpRequest request)
+    #endregion
+
+    #region Delete
+
+    public async Task<Response<Airport>> DeleteAirport(int airportId, HttpRequest request)
     {
-        var result = await _context.Airports.FindAsync(id) ??
-                     throw new AirportNotFoundException($"Airport '{id}' not found");
+        var result = await _context.Airports.FindAsync(airportId) ??
+            throw new AirportNotFoundException($"Airport '{airportId}' not found");
 
         var oldData = JsonConvert.SerializeObject(result);
         _context.Airports.Remove(result);
 
-        await _loggingService.AddWebsiteLog(request, $"Deleted airport '{id}'", oldData, string.Empty);
+        await _loggingService.AddWebsiteLog(request, $"Deleted airport '{airportId}'", oldData, string.Empty);
 
         return new Response<Airport>
         {
             StatusCode = HttpStatusCode.Created,
-            Message = $"Deleted airport '{id}'",
+            Message = $"Deleted airport '{airportId}'",
             Data = result
         };
     }
+
+    #endregion
 }
