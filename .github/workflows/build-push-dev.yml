@@ -27,6 +27,7 @@ jobs:
         EmailOptions.Password: ${{ secrets.EMAIL_PASSWORD }}
         EmailOptions.From: ${{ secrets.EMAIL_FROM_DEV }}
         EmailOptions.Website: ${{ secrets.EMAIL_WEBSITE_DEV }}
+        Sentry.Dsn: ${{ secrets.SENTRY_DSN_SERVER }}
     - name: Inject jobs secrets
       uses: microsoft/variable-substitution@v1
       with:
@@ -34,6 +35,7 @@ jobs:
       env:
         ConnectionString: ${{ secrets.CONN_STRING_DEV }}
         VatusaApiKey: ${{ secrets.VATUSA_API_KEY }}
+        SentryDsn: ${{ secrets.SENTRY_DSN_JOBS }}
     - name: Log into registry
       run: docker login -u ${{ secrets.DO_REGISTRY_TOKEN }} -p ${{ secrets.DO_REGISTRY_TOKEN }} registry.digitalocean.com
     - name: Build server image 
