@@ -46,7 +46,9 @@ public class LoaRepository : ILoaRepository
 
     public async Task<Response<IList<Loa>>> GetLoas()
     {
-        var loas = await _context.Loas.ToListAsync();
+        var loas = await _context.Loas
+            .Include(x => x.User)
+            .ToListAsync();
         return new Response<IList<Loa>>
         {
             StatusCode = HttpStatusCode.OK,

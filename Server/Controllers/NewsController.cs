@@ -1,13 +1,12 @@
-﻿using System.Net;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories;
 using ZDC.Server.Repositories.Interfaces;
-using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
 using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
@@ -16,15 +15,15 @@ namespace ZDC.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class LoasController : ControllerBase
+public class NewsController : ControllerBase
 {
-    private readonly ILoaRepository _loaRepository;
-    private readonly IValidator<Loa> _validator;
+    private readonly INewsRepository _newsRepository;
+    private readonly IValidator<News> _validator;
     private readonly IHub _sentryHub;
 
-    public LoasController(ILoaRepository loaRepository, IValidator<Loa> validator, IHub sentryHub)
+    public NewsController(INewsRepository newsRepository, IValidator<News> validator, IHub sentryHub)
     {
-        _loaRepository = loaRepository;
+        _newsRepository = newsRepository;
         _validator = validator;
         _sentryHub = sentryHub;
     }
@@ -33,13 +32,14 @@ public class LoasController : ControllerBase
 
     [HttpPost]
     // todo auth
-    [SwaggerResponse(200, "Created loa", typeof(Response<Loa>))]
+    [SwaggerResponse(200, "Created news", typeof(Response<News>))]
+    [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Loa>>> CreateLoa([FromBody] Loa loa)
+    public async Task<ActionResult<Response<News>>> CreateNews([FromBody] News news)
     {
         try
         {
-            var result = await _validator.ValidateAsync(loa);
+            var result = await _validator.ValidateAsync(news);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -49,7 +49,16 @@ public class LoasController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _loaRepository.CreateLoa(loa, Request));
+            return Ok(await _newsRepository.CreateNews(news, Request));
+        }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
         }
         catch (Exception ex)
         {
@@ -62,14 +71,13 @@ public class LoasController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
-    [SwaggerResponse(200, "Got loas", typeof(Response<IList<Loa>>))]
+    [SwaggerResponse(200, "Got all news", typeof(Response<IList<News>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Loa>>>> GetLoas()
+    public async Task<ActionResult<Response<IList<News>>>> GetNews()
     {
         try
         {
-            return Ok(await _loaRepository.GetLoas());
+            return Ok(await _newsRepository.GetNews());
         }
         catch (Exception ex)
         {
@@ -77,18 +85,17 @@ public class LoasController : ControllerBase
         }
     }
 
-    [HttpGet("{loaId:int}")]
-    // todo auth
-    [SwaggerResponse(200, "Got loa", typeof(Response<Loa>))]
-    [SwaggerResponse(404, "Loa not found")]
+    [HttpGet("{newsId:int}")]
+    [SwaggerResponse(200, "Got news", typeof(Response<News>))]
+    [SwaggerResponse(400, "News not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Loa>>> GetLoa(int loaId)
+    public async Task<ActionResult<Response<News>>> GetNews(int newsId)
     {
         try
         {
-            return Ok(await _loaRepository.GetLoa(loaId));
+            return Ok(await _newsRepository.GetNews(newsId));
         }
-        catch (LoaNotFoundException ex)
+        catch (NewsNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -109,16 +116,35 @@ public class LoasController : ControllerBase
 
     [HttpPut]
     // todo auth
-    [SwaggerResponse(200, "Updated loa", typeof(Response<Loa>))]
-    [SwaggerResponse(404, "Loa not found")]
+    [SwaggerResponse(200, "Updated news", typeof(Response<News>))]
+    [SwaggerResponse(404, "User or news not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Loa>>> UpdateLoa([FromBody] Loa loa)
+    public async Task<ActionResult<Response<News>>> UpdateNews([FromBody] News news)
     {
         try
         {
-            return Ok(await _loaRepository.UpdateLoa(loa, Request));
+            var result = await _validator.ValidateAsync(news);
+            if (!result.IsValid)
+            {
+                return BadRequest(new Response<IList<ValidationFailure>>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Message = "Validation error",
+                    Data = result.Errors
+                });
+            }
+            return Ok(await _newsRepository.UpdateNews(news, Request));
         }
-        catch (LoaNotFoundException ex)
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
+        }
+        catch (NewsNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -137,18 +163,18 @@ public class LoasController : ControllerBase
 
     #region Delete
 
-    [HttpDelete("{loaId:int}")]
+    [HttpDelete("{newsId:int}")]
     // todo auth
-    [SwaggerResponse(200, "Deleted loa", typeof(Response<Loa>))]
-    [SwaggerResponse(404, "Loa not found")]
+    [SwaggerResponse(200, "Deleted news", typeof(Response<News>))]
+    [SwaggerResponse(404, "News not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Loa>>> DeleteLoa(int loaId)
+    public async Task<ActionResult<Response<News>>> DeleteNews(int newsId)
     {
         try
         {
-            return Ok(await _loaRepository.DeleteLoa(loaId, Request));
+            return Ok(await _newsRepository.DeleteNews(newsId, Request));
         }
-        catch (LoaNotFoundException ex)
+        catch (NewsNotFoundException ex)
         {
             return NotFound(new Response<string>
             {

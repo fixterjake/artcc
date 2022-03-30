@@ -70,9 +70,9 @@ public class AirportNotFoundException : Exception
     }
 }
 
-public class AnnouncementNotFoundException : Exception
+public class NewsNotFoundException : Exception
 {
-    public AnnouncementNotFoundException(string message) : base(message)
+    public NewsNotFoundException(string message) : base(message)
     {
     }
 }
@@ -122,6 +122,13 @@ public class DiscordSettingsNotFoundException : Exception
 public class SoloCertNotFoundException : Exception
 {
     public SoloCertNotFoundException(string message) : base(message)
+    {
+    }
+}
+
+public class NotificationNotFoundException : Exception
+{
+    public NotificationNotFoundException(string message) : base(message)
     {
     }
 }

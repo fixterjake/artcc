@@ -86,6 +86,8 @@ builder.Services.AddTransient<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddTransient<IFileRepository, FileRepository>();
 builder.Services.AddTransient<IStatsRepository, StatsRepository>();
 builder.Services.AddTransient<ILoaRepository, LoaRepository>();
+builder.Services.AddTransient<INewsRepository, NewsRepository>();
+builder.Services.AddTransient<INotificationRepository, NotificationRepository>();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 

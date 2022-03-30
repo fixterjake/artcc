@@ -8,6 +8,7 @@ using ZDC.Server.Services.Interfaces;
 using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
 using File = ZDC.Shared.Models.File;
+using FileNotFoundException = ZDC.Shared.FileNotFoundException;
 
 namespace ZDC.Server.Repositories;
 
@@ -116,7 +117,7 @@ public class FileRepository : IFileRepository
         var result = _context.Files.Remove(file);
         await _context.SaveChangesAsync();
 
-        await _loggingService.AddWebsiteLog(request, $"Deletyed file '{result.Entity.Id}'", oldData, string.Empty);
+        await _loggingService.AddWebsiteLog(request, $"Deleted file '{result.Entity.Id}'", oldData, string.Empty);
 
         return new Response<File>
         {

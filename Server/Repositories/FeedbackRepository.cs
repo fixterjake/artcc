@@ -14,11 +14,13 @@ public class FeedbackRepository : IFeedbackRepository
 {
     private readonly DatabaseContext _context;
     private readonly ILoggingService _loggingService;
+    private readonly INotificationRepository _notificationRepository;
 
-    public FeedbackRepository(DatabaseContext context, ILoggingService loggingService)
+    public FeedbackRepository(DatabaseContext context, ILoggingService loggingService, INotificationRepository notificationRepository)
     {
         _context = context;
         _loggingService = loggingService;
+        _notificationRepository = notificationRepository;
     }
 
     #region Create
@@ -30,6 +32,8 @@ public class FeedbackRepository : IFeedbackRepository
         var newData = JsonConvert.SerializeObject(result.Entity);
 
         await _loggingService.AddWebsiteLog(request, $"Created feedback '{result.Entity.Id}'", string.Empty, newData);
+
+
 
         return new Response<string>
         {
