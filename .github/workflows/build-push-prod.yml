@@ -1,8 +1,8 @@
 name: Build & Push Prod
 on:
-  push:
-    branches:
-      - main
+  create:
+    tags:
+      - v*
 jobs:
   DockerBuildPush:
     runs-on: ubuntu-latest
