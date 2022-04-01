@@ -3,9 +3,9 @@ using ZDC.Shared.Models;
 
 namespace ZDC.Server.Validators;
 
-public class NewsValidator : AbstractValidator<News>
+public class AnnouncementValidator : AbstractValidator<Announcement>
 {
-    public NewsValidator()
+    public AnnouncementValidator()
     {
         RuleFor(x => x.Title).NotEmpty();
         RuleFor(x => x.Content).NotEmpty();

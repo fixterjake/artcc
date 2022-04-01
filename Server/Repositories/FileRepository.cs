@@ -90,6 +90,7 @@ public class FileRepository : IFileRepository
             throw new FileNotFoundException($"File '{file.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbFile);
+        file.Updated = DateTimeOffset.UtcNow;
         var result = _context.Files.Update(file);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(result.Entity);

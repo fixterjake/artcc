@@ -15,12 +15,15 @@ public class FeedbackRepository : IFeedbackRepository
     private readonly DatabaseContext _context;
     private readonly ILoggingService _loggingService;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IConfiguration _configuration;
 
-    public FeedbackRepository(DatabaseContext context, ILoggingService loggingService, INotificationRepository notificationRepository)
+    public FeedbackRepository(DatabaseContext context, ILoggingService loggingService,
+        INotificationRepository notificationRepository, IConfiguration configuration)
     {
         _context = context;
         _loggingService = loggingService;
         _notificationRepository = notificationRepository;
+        _configuration = configuration;
     }
 
     #region Create
@@ -33,13 +36,15 @@ public class FeedbackRepository : IFeedbackRepository
 
         await _loggingService.AddWebsiteLog(request, $"Created feedback '{result.Entity.Id}'", string.Empty, newData);
 
-
+        var website = _configuration.GetSection("EmailOptions").GetValue<string>("website");
+        await _notificationRepository.AddSeniorStaffNotification("New Feedback", $"New feedback has been submitted",
+            $"{website}/feedback/{result.Entity.Id}");
 
         return new Response<string>
         {
             StatusCode = HttpStatusCode.Created,
-            Message = $"Created airport '{result.Entity.Id}'",
-            Data = $"Created airport '{result.Entity.Id}'"
+            Message = $"Created feedback '{result.Entity.Id}'",
+            Data = $"Created feedback '{result.Entity.Id}'"
         };
     }
 

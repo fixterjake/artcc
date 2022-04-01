@@ -76,6 +76,7 @@ public class AirportRepository : IAirportRepository
             throw new AirportNotFoundException($"Airport '{airport.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbAirport);
+        airport.Updated = DateTimeOffset.UtcNow;
         var result = _context.Airports.Update(airport);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(result.Entity);

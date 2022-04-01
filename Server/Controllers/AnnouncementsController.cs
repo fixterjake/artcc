@@ -15,15 +15,15 @@ namespace ZDC.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class NewsController : ControllerBase
+public class AnnouncementController : ControllerBase
 {
-    private readonly INewsRepository _newsRepository;
-    private readonly IValidator<News> _validator;
+    private readonly IAnnouncementRepository _announcementRepository;
+    private readonly IValidator<Announcement> _validator;
     private readonly IHub _sentryHub;
 
-    public NewsController(INewsRepository newsRepository, IValidator<News> validator, IHub sentryHub)
+    public AnnouncementController(IAnnouncementRepository announcementRepository, IValidator<Announcement> validator, IHub sentryHub)
     {
-        _newsRepository = newsRepository;
+        _announcementRepository = announcementRepository;
         _validator = validator;
         _sentryHub = sentryHub;
     }
@@ -32,14 +32,14 @@ public class NewsController : ControllerBase
 
     [HttpPost]
     // todo auth
-    [SwaggerResponse(200, "Created news", typeof(Response<News>))]
+    [SwaggerResponse(200, "Created announcement", typeof(Response<Announcement>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<News>>> CreateNews([FromBody] News news)
+    public async Task<ActionResult<Response<Announcement>>> CreateAnnouncement([FromBody] Announcement announcement)
     {
         try
         {
-            var result = await _validator.ValidateAsync(news);
+            var result = await _validator.ValidateAsync(announcement);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -49,7 +49,7 @@ public class NewsController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _newsRepository.CreateNews(news, Request));
+            return Ok(await _announcementRepository.CreateAnnouncement(announcement, Request));
         }
         catch (UserNotFoundException ex)
         {
@@ -71,13 +71,13 @@ public class NewsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all news", typeof(Response<IList<News>>))]
+    [SwaggerResponse(200, "Got all announcements", typeof(Response<IList<Announcement>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<News>>>> GetNews()
+    public async Task<ActionResult<Response<IList<Announcement>>>> GetAnnouncements()
     {
         try
         {
-            return Ok(await _newsRepository.GetNews());
+            return Ok(await _announcementRepository.GetAnnouncements());
         }
         catch (Exception ex)
         {
@@ -85,17 +85,17 @@ public class NewsController : ControllerBase
         }
     }
 
-    [HttpGet("{newsId:int}")]
-    [SwaggerResponse(200, "Got news", typeof(Response<News>))]
-    [SwaggerResponse(400, "News not found")]
+    [HttpGet("{announcementId:int}")]
+    [SwaggerResponse(200, "Got announcements", typeof(Response<Announcement>))]
+    [SwaggerResponse(400, "Announcement not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<News>>> GetNews(int newsId)
+    public async Task<ActionResult<Response<Announcement>>> GetAnnouncement(int announcementId)
     {
         try
         {
-            return Ok(await _newsRepository.GetNews(newsId));
+            return Ok(await _announcementRepository.GetAnnouncement(announcementId));
         }
-        catch (NewsNotFoundException ex)
+        catch (AnnouncementNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -116,14 +116,14 @@ public class NewsController : ControllerBase
 
     [HttpPut]
     // todo auth
-    [SwaggerResponse(200, "Updated news", typeof(Response<News>))]
-    [SwaggerResponse(404, "User or news not found")]
+    [SwaggerResponse(200, "Updated announcement", typeof(Response<Announcement>))]
+    [SwaggerResponse(404, "User or announcement not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<News>>> UpdateNews([FromBody] News news)
+    public async Task<ActionResult<Response<Announcement>>> UpdateAnnouncement([FromBody] Announcement announcement)
     {
         try
         {
-            var result = await _validator.ValidateAsync(news);
+            var result = await _validator.ValidateAsync(announcement);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -133,7 +133,7 @@ public class NewsController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _newsRepository.UpdateNews(news, Request));
+            return Ok(await _announcementRepository.UpdateAnnouncement(announcement, Request));
         }
         catch (UserNotFoundException ex)
         {
@@ -144,7 +144,7 @@ public class NewsController : ControllerBase
                 Data = string.Empty
             });
         }
-        catch (NewsNotFoundException ex)
+        catch (AnnouncementNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -163,18 +163,18 @@ public class NewsController : ControllerBase
 
     #region Delete
 
-    [HttpDelete("{newsId:int}")]
+    [HttpDelete("{AnnouncementId:int}")]
     // todo auth
-    [SwaggerResponse(200, "Deleted news", typeof(Response<News>))]
+    [SwaggerResponse(200, "Deleted announcement", typeof(Response<Announcement>))]
     [SwaggerResponse(404, "News not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<News>>> DeleteNews(int newsId)
+    public async Task<ActionResult<Response<Announcement>>> DeleteAnnouncement(int announcementId)
     {
         try
         {
-            return Ok(await _newsRepository.DeleteNews(newsId, Request));
+            return Ok(await _announcementRepository.DeleteAnnouncement(announcementId, Request));
         }
-        catch (NewsNotFoundException ex)
+        catch (AnnouncementNotFoundException ex)
         {
             return NotFound(new Response<string>
             {

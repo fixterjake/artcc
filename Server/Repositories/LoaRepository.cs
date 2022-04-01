@@ -15,11 +15,16 @@ public class LoaRepository : ILoaRepository
 {
     private readonly DatabaseContext _context;
     private readonly ILoggingService _loggingService;
+    private readonly INotificationRepository _notificationRepository;
+    private readonly IConfiguration _configuration;
 
-    public LoaRepository(DatabaseContext context, ILoggingService loggingService)
+    public LoaRepository(DatabaseContext context, ILoggingService loggingService,
+        INotificationRepository notificationRepository, IConfiguration configuration)
     {
         _context = context;
         _loggingService = loggingService;
+        _notificationRepository = notificationRepository;
+        _configuration = configuration;
     }
 
     #region Create
@@ -31,6 +36,10 @@ public class LoaRepository : ILoaRepository
         var newData = JsonConvert.SerializeObject(result.Entity);
 
         await _loggingService.AddWebsiteLog(request, $"Created loa '{result.Entity.Id}'", string.Empty, newData);
+
+        var website = _configuration.GetSection("EmailOptions").GetValue<string>("website");
+        await _notificationRepository.AddSeniorStaffNotification("New LOA Request", $"A new LOA request has been submitted",
+            $"{website}/loas/{result.Entity.Id}");
 
         return new Response<Loa>
         {
@@ -82,17 +91,18 @@ public class LoaRepository : ILoaRepository
             throw new LoaNotFoundException($"Loa '{loa.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbLoa);
-        _context.Loas.Update(loa);
+        loa.Updated = DateTimeOffset.UtcNow;
+        var result = _context.Loas.Update(loa);
         await _context.SaveChangesAsync();
-        var newData = JsonConvert.SerializeObject(loa);
+        var newData = JsonConvert.SerializeObject(result.Entity);
 
-        await _loggingService.AddWebsiteLog(request, $"Updated loa '{loa.Id}'", oldData, newData);
+        await _loggingService.AddWebsiteLog(request, $"Updated loa '{result.Entity.Id}'", oldData, newData);
 
         return new Response<Loa>
         {
             StatusCode = HttpStatusCode.Created,
-            Message = $"Updated loa '{loa.Id}'",
-            Data = loa
+            Message = $"Updated loa '{result.Entity.Id}'",
+            Data = result.Entity
         };
     }
 

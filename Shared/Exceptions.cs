@@ -70,9 +70,9 @@ public class AirportNotFoundException : Exception
     }
 }
 
-public class NewsNotFoundException : Exception
+public class AnnouncementNotFoundException : Exception
 {
-    public NewsNotFoundException(string message) : base(message)
+    public AnnouncementNotFoundException(string message) : base(message)
     {
     }
 }
@@ -129,6 +129,13 @@ public class SoloCertNotFoundException : Exception
 public class NotificationNotFoundException : Exception
 {
     public NotificationNotFoundException(string message) : base(message)
+    {
+    }
+}
+
+public class PositionNotFoundException : Exception
+{
+    public PositionNotFoundException(string message) : base(message)
     {
     }
 }

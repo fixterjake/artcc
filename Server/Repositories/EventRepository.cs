@@ -173,6 +173,7 @@ public class EventRepository : IEventRepository
             throw new EventNotFoundException($"Event '{@event.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbEvent);
+        @event.Updated = DateTimeOffset.UtcNow;
         var result = _context.Events.Update(@event);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(result.Entity);

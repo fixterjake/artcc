@@ -18,11 +18,109 @@ public class NotificationRepository : INotificationRepository
         _context = context;
     }
 
+    #region Create
+
+    public async Task AddSeniorStaffNotification(string title, string description, string link)
+    {
+        var users = await _context.Users
+            .Include(x => x.Roles)
+            .ToListAsync();
+        var usersFinal = new List<User>();
+        foreach (var entry in users)
+        {
+            if (entry.Roles == null || entry.Roles.Count == 0)
+                continue;
+            var roles = entry.Roles.Select(x => x.Name);
+            if (roles.Contains("ATM") || roles.Contains("DATM") ||
+                roles.Contains("TA") || roles.Contains("WM"))
+                usersFinal.Add(entry);
+        }
+        foreach (var entry in usersFinal)
+            await AddNotification(new Notification
+            {
+                UserId = entry.Id,
+                Title = title,
+                Description = description,
+                Link = link
+            });
+    }
+
+    public async Task AddStaffNotification(string title, string description, string link)
+    {
+        var users = await _context.Users
+            .Include(x => x.Roles)
+            .ToListAsync();
+        var usersFinal = new List<User>();
+        foreach (var entry in users)
+        {
+            if (entry.Roles == null || entry.Roles.Count == 0)
+                continue;
+            var roles = entry.Roles.Select(x => x.Name);
+            if (roles.Contains("ATM") || roles.Contains("DATM") ||
+                roles.Contains("TA") || roles.Contains("ATA") ||
+                roles.Contains("WM") || roles.Contains("AWM") ||
+                roles.Contains("EC") || roles.Contains("AEC") ||
+                roles.Contains("FE") || roles.Contains("AFE"))
+                usersFinal.Add(entry);
+        }
+        foreach (var entry in usersFinal)
+            await AddNotification(new Notification
+            {
+                UserId = entry.Id,
+                Title = title,
+                Description = description,
+                Link = link
+            });
+    }
+
+    public async Task AddTrainingNotification(string title, string description, string link)
+    {
+        var users = await _context.Users
+            .Include(x => x.Roles)
+            .ToListAsync();
+        var usersFinal = new List<User>();
+        foreach (var entry in users)
+        {
+            if (entry.Roles == null || entry.Roles.Count == 0)
+                continue;
+            var roles = entry.Roles.Select(x => x.Name);
+            if (roles.Contains("ATM") || roles.Contains("DATM") ||
+                roles.Contains("TA") || roles.Contains("ATA") ||
+                roles.Contains("WM"))
+                usersFinal.Add(entry);
+        }
+        foreach (var entry in usersFinal)
+            await AddNotification(new Notification
+            {
+                UserId = entry.Id,
+                Title = title,
+                Description = description,
+                Link = link
+            });
+    }
+
+    public async Task AddAllNotification(string title, string description, string link)
+    {
+        var users = await _context.Users.Where(x => x.Status != UserStatus.Removed).ToListAsync();
+        foreach (var entry in users)
+            await AddNotification(new Notification
+            {
+                UserId = entry.Id,
+                Title = title,
+                Description = description,
+                Link = link
+            });
+    }
+
     public async Task AddNotification(Notification notification)
     {
         await _context.Notifications.AddAsync(notification);
         await _context.SaveChangesAsync();
     }
+
+    #endregion
+
+    #region Read
 
     public async Task<Response<IList<Notification>>> GetNotifications(HttpRequest request)
     {
@@ -42,6 +140,10 @@ public class NotificationRepository : INotificationRepository
         };
     }
 
+    #endregion
+
+    #region Update
+
     public async Task ReadNotification(int notificationId, HttpRequest request)
     {
         var notification = await _context.Notifications.FindAsync(notificationId) ??
@@ -49,4 +151,6 @@ public class NotificationRepository : INotificationRepository
         notification.Read = true;
         await _context.SaveChangesAsync();
     }
+
+    #endregion
 }

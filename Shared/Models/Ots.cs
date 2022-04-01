@@ -7,7 +7,7 @@ public class Ots
     public User? User { get; set; }
     public int RecommenderId { get; set; }
     public User? Recommender { get; set; }
-    public int InstructorId { get; set; }
+    public int? InstructorId { get; set; }
     public User? Instructor { get; set; }
     public TrainingFacility Facility { get; set; }
     public TrainingPosition Position { get; set; }

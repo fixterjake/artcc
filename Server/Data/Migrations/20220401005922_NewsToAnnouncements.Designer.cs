@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZDC.Server.Data;
@@ -11,9 +12,10 @@ using ZDC.Server.Data;
 namespace ZDC.Server.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220401005922_NewsToAnnouncements")]
+    partial class NewsToAnnouncements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -542,7 +544,7 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Facility")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("InstructorId")
+                    b.Property<int>("InstructorId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Position")
@@ -1099,7 +1101,9 @@ namespace ZDC.Server.Migrations
                 {
                     b.HasOne("ZDC.Shared.Models.User", "Instructor")
                         .WithMany()
-                        .HasForeignKey("InstructorId");
+                        .HasForeignKey("InstructorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ZDC.Shared.Models.User", "Recommender")
                         .WithMany()

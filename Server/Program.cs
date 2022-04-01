@@ -57,6 +57,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString")));
 
 builder.Services.AddTransient<IValidator<Airport>, AirportValidator>();
+builder.Services.AddTransient<IValidator<Announcement>, AnnouncementValidator>();
 builder.Services.AddTransient<IValidator<Comment>, CommentValidator>();
 builder.Services.AddTransient<IValidator<EventPosition>, EventPositionValidator>();
 builder.Services.AddTransient<IValidator<EventRegistration>, EventRegistrationValidator>();
@@ -64,7 +65,7 @@ builder.Services.AddTransient<IValidator<Event>, EventValidator>();
 builder.Services.AddTransient<IValidator<Feedback>, FeedbackValidator>();
 builder.Services.AddTransient<IValidator<File>, FileValidator>();
 builder.Services.AddTransient<IValidator<Loa>, LoaValidator>();
-builder.Services.AddTransient<IValidator<News>, NewsValidator>();
+builder.Services.AddTransient<IValidator<Ots>, OtsValidator>();
 builder.Services.AddTransient<IValidator<Position>, PositionValidator>();
 builder.Services.AddTransient<IValidator<Settings>, SettingsValidator>();
 builder.Services.AddTransient<IValidator<SoloCert>, SoloCertValidator>();
@@ -78,6 +79,7 @@ builder.Services.AddTransient<ILoggingService, LoggingService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddTransient<IAirportRepository, AirportRepository>();
+builder.Services.AddTransient<IAnnouncementRepository, AnnouncementRepository>();
 builder.Services.AddTransient<ICommentRepository, CommentRepository>();
 builder.Services.AddTransient<IControllerLogRepository, ControllerLogRepository>();
 builder.Services.AddTransient<IEmailLogRepository, EmailLogRepository>();
@@ -86,8 +88,10 @@ builder.Services.AddTransient<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddTransient<IFileRepository, FileRepository>();
 builder.Services.AddTransient<IStatsRepository, StatsRepository>();
 builder.Services.AddTransient<ILoaRepository, LoaRepository>();
-builder.Services.AddTransient<INewsRepository, NewsRepository>();
 builder.Services.AddTransient<INotificationRepository, NotificationRepository>();
+builder.Services.AddTransient<IOnlineControllerRepository, OnlineControllerRepository>();
+builder.Services.AddTransient<IOtsRepository, OtsRepository>();
+builder.Services.AddTransient<IPositionRepository, PositionRepository>();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 
