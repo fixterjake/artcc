@@ -14,5 +14,6 @@ public class AutomapperConfig : Profile
         CreateMap<User, UserDto>();
         CreateMap<ControllerLog, ControllerLogDto>();
         CreateMap<Hours, HoursDto>();
+        CreateMap<SoloCert, SoloCertDto>();
     }
 }

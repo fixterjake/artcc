@@ -1,6 +1,8 @@
 ﻿using System.Net;
+using Amazon.Runtime.Internal.Util;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using ZDC.Server.Data;
 using ZDC.Server.Repositories.Interfaces;
@@ -14,12 +16,14 @@ namespace ZDC.Server.Repositories;
 public class UserRepository : IUserRepository
 {
     private readonly DatabaseContext _context;
+    private readonly IDistributedCache _cache;
     private readonly ILoggingService _loggingService;
     private readonly IMapper _mapper;
 
-    public UserRepository(DatabaseContext context, ILoggingService loggingService, IMapper mapper)
+    public UserRepository(DatabaseContext context, IDistributedCache cache, ILoggingService loggingService, IMapper mapper)
     {
         _context = context;
+        _cache = cache;
         _loggingService = loggingService;
         _mapper = mapper;
     }
@@ -48,13 +52,33 @@ public class UserRepository : IUserRepository
 
     public async Task<Response<IList<UserDto>>> GetUsers()
     {
-        var result = await _context.Users.ToListAsync();
-        var users = _mapper.Map<IList<UserDto>>(result);
+        var cachedUsers = await _cache.GetStringAsync("_users");
+        if (!string.IsNullOrEmpty(cachedUsers))
+        {
+            var users = JsonConvert.DeserializeObject<List<UserDto>>(cachedUsers);
+            if (users != null)
+                return new Response<IList<UserDto>>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = $"Got {users.Count} users",
+                    Data = users
+                };
+        }
+
+        var resultRaw = await _context.Users.ToListAsync();
+        var result = _mapper.Map<IList<UserDto>>(resultRaw);
+        var expiryOptions = new DistributedCacheEntryOptions()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
+            SlidingExpiration = TimeSpan.FromMinutes(1)
+        };
+        await _cache.SetStringAsync("_users", JsonConvert.SerializeObject(result), expiryOptions);
+
         return new Response<IList<UserDto>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {users.Count} users",
-            Data = users
+            Message = $"Got {result.Count} users",
+            Data = result
         };
     }
 

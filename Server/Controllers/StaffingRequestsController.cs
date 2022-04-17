@@ -1,9 +1,9 @@
-﻿using System.Net;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Shared;
@@ -14,15 +14,16 @@ namespace ZDC.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AirportsController : ControllerBase
+public class StaffingRequestsController : ControllerBase
 {
-    private readonly IAirportRepository _airportRepository;
-    private readonly IValidator<Airport> _validator;
+    private readonly IStaffingRequestRepository _staffingRequestRepository;
+    private readonly IValidator<StaffingRequest> _validator;
     private readonly IHub _sentryHub;
 
-    public AirportsController(IAirportRepository airportRepository, IValidator<Airport> validator, IHub sentryHub)
+    public StaffingRequestsController(IStaffingRequestRepository staffingRequestRepository,
+        IValidator<StaffingRequest> validator, IHub sentryHub)
     {
-        _airportRepository = airportRepository;
+        _staffingRequestRepository = staffingRequestRepository;
         _validator = validator;
         _sentryHub = sentryHub;
     }
@@ -31,13 +32,13 @@ public class AirportsController : ControllerBase
 
     [HttpPost]
     // todo auth
-    [SwaggerResponse(201, "Created airport", typeof(Response<Airport>))]
+    [SwaggerResponse(201, "Created staffing request", typeof(Response<StaffingRequest>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Airport>>> CreateAirport([FromBody] Airport airport)
+    public async Task<ActionResult<Response<StaffingRequest>>> CreateStaffingRequest([FromBody] StaffingRequest staffingRequest)
     {
         try
         {
-            var result = await _validator.ValidateAsync(airport);
+            var result = await _validator.ValidateAsync(staffingRequest);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -47,7 +48,7 @@ public class AirportsController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _airportRepository.CreateAirport(airport, Request));
+            return Ok(await _staffingRequestRepository.CreateStaffingRequest(staffingRequest, Request));
         }
         catch (Exception ex)
         {
@@ -60,13 +61,14 @@ public class AirportsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all airports", typeof(Response<IList<Airport>>))]
+    // todo auth
+    [SwaggerResponse(200, "Got all staffing requests", typeof(Response<IList<StaffingRequest>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Airport>>>> GetAirports()
+    public async Task<ActionResult<Response<IList<StaffingRequest>>>> GetStaffingRequests()
     {
         try
         {
-            return Ok(await _airportRepository.GetAirports());
+            return Ok(await _staffingRequestRepository.GetStaffingRequests());
         }
         catch (Exception ex)
         {
@@ -74,17 +76,18 @@ public class AirportsController : ControllerBase
         }
     }
 
-    [HttpGet("{airportId:int}")]
-    [SwaggerResponse(200, "Got airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
+    [HttpGet("{staffingRequestId:int}")]
+    // todo auth
+    [SwaggerResponse(200, "Got staffing request", typeof(Response<StaffingRequest>))]
+    [SwaggerResponse(404, "Staffing request not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Airport>>> GetAirport(int airportId)
+    public async Task<ActionResult<Response<StaffingRequest>>> GetStaffingRequest(int staffingRequestId)
     {
         try
         {
-            return Ok(await _airportRepository.GetAirport(airportId));
+            return Ok(await _staffingRequestRepository.GetStaffingRequest(staffingRequestId));
         }
-        catch (AirportNotFoundException ex)
+        catch (StaffingRequestNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -105,14 +108,13 @@ public class AirportsController : ControllerBase
 
     [HttpPut]
     // todo auth
-    [SwaggerResponse(200, "Updated airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
+    [SwaggerResponse(200, "Updated staffing request", typeof(Response<StaffingRequest>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Airport>>> UpdateAirport([FromBody] Airport airport)
+    public async Task<ActionResult<Response<StaffingRequest>>> UpdateStaffingRequest([FromBody] StaffingRequest staffingRequest)
     {
         try
         {
-            var result = await _validator.ValidateAsync(airport);
+            var result = await _validator.ValidateAsync(staffingRequest);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -122,9 +124,9 @@ public class AirportsController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _airportRepository.UpdateAirport(airport, Request));
+            return Ok(await _staffingRequestRepository.UpdateStaffingRequest(staffingRequest, Request));
         }
-        catch (AirportNotFoundException ex)
+        catch (StaffingRequestNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -143,18 +145,18 @@ public class AirportsController : ControllerBase
 
     #region Delete
 
-    [HttpDelete("{airportId:int}")]
+    [HttpDelete("{staffingRequestId:int}")]
     // todo auth
-    [SwaggerResponse(200, "Deleted airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
+    [SwaggerResponse(200, "Deleted staffing request", typeof(Response<StaffingRequest>))]
+    [SwaggerResponse(404, "Staffing request not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Airport>>> DeleteAirport(int airportId)
+    public async Task<ActionResult<Response<StaffingRequest>>> DeleteStaffingRequest(int staffingRequestId)
     {
         try
         {
-            return Ok(await _airportRepository.DeleteAirport(airportId, Request));
+            return Ok(await _staffingRequestRepository.DeleteStaffingRequest(staffingRequestId, Request));
         }
-        catch (AirportNotFoundException ex)
+        catch (StaffingRequestNotFoundException ex)
         {
             return NotFound(new Response<string>
             {

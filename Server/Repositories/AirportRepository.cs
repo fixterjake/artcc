@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using ZDC.Server.Data;
 using ZDC.Server.Repositories.Interfaces;
@@ -13,11 +14,13 @@ namespace ZDC.Server.Repositories;
 public class AirportRepository : IAirportRepository
 {
     private readonly DatabaseContext _context;
+    private readonly IDistributedCache _cache;
     private readonly ILoggingService _loggingService;
 
-    public AirportRepository(DatabaseContext context, ILoggingService loggingService)
+    public AirportRepository(DatabaseContext context, IDistributedCache cache, ILoggingService loggingService)
     {
         _context = context;
+        _cache = cache;
         _loggingService = loggingService;
     }
 
@@ -45,7 +48,27 @@ public class AirportRepository : IAirportRepository
 
     public async Task<Response<IList<Airport>>> GetAirports()
     {
+        var cachedAirports = await _cache.GetStringAsync("_airports");
+        if (!string.IsNullOrEmpty(cachedAirports))
+        {
+            var airports = JsonConvert.DeserializeObject<List<Airport>>(cachedAirports);
+            if (airports != null)
+                return new Response<IList<Airport>>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = $"Got {airports.Count} airports",
+                    Data = airports
+                };
+        }
+
         var result = await _context.Airports.ToListAsync();
+        var expiryOptions = new DistributedCacheEntryOptions()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
+            SlidingExpiration = TimeSpan.FromMinutes(1)
+        };
+        await _cache.SetStringAsync("_airports", JsonConvert.SerializeObject(result), expiryOptions);
+
         return new Response<IList<Airport>>
         {
             StatusCode = HttpStatusCode.OK,

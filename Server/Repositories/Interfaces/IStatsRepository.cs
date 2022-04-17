@@ -4,5 +4,5 @@ namespace ZDC.Server.Repositories.Interfaces;
 
 public interface IStatsRepository
 {
-    Task<IList<StatsDto>> GetStats(int month, int year);
+    Task<Response<IList<StatsDto>>> GetStats(int month, int year);
 }

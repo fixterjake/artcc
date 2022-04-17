@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System.Net;
 using ZDC.Server.Data;
@@ -15,14 +15,16 @@ namespace ZDC.Server.Repositories;
 public class AnnouncementRepository : IAnnouncementRepository
 {
     private readonly DatabaseContext _context;
+    private readonly IDistributedCache _cache;
     private readonly ILoggingService _loggingService;
     private readonly INotificationRepository _notificationRepository;
     private readonly IConfiguration _configuration;
 
-    public AnnouncementRepository(DatabaseContext context, ILoggingService loggingService,
+    public AnnouncementRepository(DatabaseContext context, IDistributedCache cache, ILoggingService loggingService,
         INotificationRepository notificationRepository, IConfiguration configuration)
     {
         _context = context;
+        _cache = cache;
         _loggingService = loggingService;
         _notificationRepository = notificationRepository;
         _configuration = configuration;
@@ -61,25 +63,45 @@ public class AnnouncementRepository : IAnnouncementRepository
 
     public async Task<Response<IList<Announcement>>> GetAnnouncements()
     {
-        var announcements = await _context.Announcements.ToListAsync();
+
+        var cachedAnnouncements = await _cache.GetStringAsync("_announcements");
+        if (!string.IsNullOrEmpty(cachedAnnouncements))
+        {
+            var announcements = JsonConvert.DeserializeObject<IList<Announcement>>(cachedAnnouncements);
+            if (announcements != null)
+                return new Response<IList<Announcement>>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = $"Got {announcements.Count} announcements",
+                    Data = announcements
+                };
+        }
+
+        var result = await _context.Announcements.ToListAsync();
+        var expiryOptions = new DistributedCacheEntryOptions()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
+            SlidingExpiration = TimeSpan.FromMinutes(1)
+        };
+        await _cache.SetStringAsync("_announcements", JsonConvert.SerializeObject(result), expiryOptions);
+
         return new Response<IList<Announcement>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {announcements.Count} announcements",
-            Data = announcements
+            Message = $"Got {result.Count} announcements",
+            Data = result
         };
     }
 
     public async Task<Response<Announcement>> GetAnnouncement(int announcementId)
     {
-        var announcement = await _context.Announcements.FindAsync(announcementId) ??
+        var result = await _context.Announcements.FindAsync(announcementId) ??
             throw new AnnouncementNotFoundException($"Announcement '{announcementId}' not found");
-
         return new Response<Announcement>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got announcement '{announcement.Id}'",
-            Data = announcement
+            Message = $"Got announcement '{result.Id}'",
+            Data = result
         };
     }
 

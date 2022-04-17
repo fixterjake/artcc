@@ -53,6 +53,11 @@ builder.Services.AddSwaggerGen(c =>
     }
 );
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetSection("Redis").GetValue<string>("Host");
+    options.InstanceName = "vzdc_api";
+});
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString")));
 
@@ -77,6 +82,7 @@ builder.Services.AddAutoMapper(typeof(AutomapperConfig));
 
 builder.Services.AddTransient<ILoggingService, LoggingService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IVatusaService, VatusaService>();
 
 builder.Services.AddTransient<IAirportRepository, AirportRepository>();
 builder.Services.AddTransient<IAnnouncementRepository, AnnouncementRepository>();
@@ -92,6 +98,8 @@ builder.Services.AddTransient<INotificationRepository, NotificationRepository>()
 builder.Services.AddTransient<IOnlineControllerRepository, OnlineControllerRepository>();
 builder.Services.AddTransient<IOtsRepository, OtsRepository>();
 builder.Services.AddTransient<IPositionRepository, PositionRepository>();
+builder.Services.AddTransient<ISoloCertRepository, SoloCertRepository>();
+builder.Services.AddTransient<IStaffingRequestRepository, StaffingRequestRepository>();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 

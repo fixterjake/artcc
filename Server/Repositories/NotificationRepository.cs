@@ -99,6 +99,33 @@ public class NotificationRepository : INotificationRepository
             });
     }
 
+    public async Task AddEventsNotification(string title, string description, string link)
+    {
+        var users = await _context.Users
+            .Include(x => x.Roles)
+            .ToListAsync();
+        var usersFinal = new List<User>();
+        foreach (var entry in users)
+        {
+            if (entry.Roles == null || entry.Roles.Count == 0)
+                continue;
+            var roles = entry.Roles.Select(x => x.Name);
+            if (roles.Contains("ATM") || roles.Contains("DATM") ||
+                roles.Contains("TA") || roles.Contains("WM") ||
+                roles.Contains("EC") || roles.Contains("AEC") ||
+                roles.Contains("EVENTS"))
+                usersFinal.Add(entry);
+        }
+        foreach (var entry in usersFinal)
+            await AddNotification(new Notification
+            {
+                UserId = entry.Id,
+                Title = title,
+                Description = description,
+                Link = link
+            });
+    }
+
     public async Task AddAllNotification(string title, string description, string link)
     {
         var users = await _context.Users.Where(x => x.Status != UserStatus.Removed).ToListAsync();

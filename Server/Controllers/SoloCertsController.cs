@@ -5,7 +5,6 @@ using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using ZDC.Server.Extensions;
-using ZDC.Server.Repositories;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Shared;
 using ZDC.Shared.Dtos;
@@ -15,15 +14,15 @@ namespace ZDC.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AnnouncementsController : ControllerBase
+public class SoloCertsController : ControllerBase
 {
-    private readonly IAnnouncementRepository _announcementRepository;
-    private readonly IValidator<Announcement> _validator;
+    private readonly ISoloCertRepository _soloCertRepository;
+    private readonly IValidator<SoloCert> _validator;
     private readonly IHub _sentryHub;
 
-    public AnnouncementsController(IAnnouncementRepository announcementRepository, IValidator<Announcement> validator, IHub sentryHub)
+    public SoloCertsController(ISoloCertRepository soloCertRepository, IValidator<SoloCert> validator, IHub sentryHub)
     {
-        _announcementRepository = announcementRepository;
+        _soloCertRepository = soloCertRepository;
         _validator = validator;
         _sentryHub = sentryHub;
     }
@@ -32,14 +31,14 @@ public class AnnouncementsController : ControllerBase
 
     [HttpPost]
     // todo auth
-    [SwaggerResponse(200, "Created announcement", typeof(Response<Announcement>))]
+    [SwaggerResponse(200, "Created solo cert", typeof(Response<SoloCert>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Announcement>>> CreateAnnouncement([FromBody] Announcement announcement)
+    public async Task<ActionResult<Response<SoloCert>>> CreateSoloCert([FromBody] SoloCert soloCert)
     {
         try
         {
-            var result = await _validator.ValidateAsync(announcement);
+            var result = await _validator.ValidateAsync(soloCert);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -49,11 +48,20 @@ public class AnnouncementsController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _announcementRepository.CreateAnnouncement(announcement, Request));
+            return Ok(await _soloCertRepository.CreateSoloCert(soloCert, Request));
         }
         catch (UserNotFoundException ex)
         {
             return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
+        }
+        catch (SoloCertExistsException ex)
+        {
+            return BadRequest(new Response<string>
             {
                 StatusCode = HttpStatusCode.NotFound,
                 Message = ex.Message,
@@ -71,13 +79,14 @@ public class AnnouncementsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all announcements", typeof(Response<IList<Announcement>>))]
+    // todo auth
+    [SwaggerResponse(200, "Got all solo certs", typeof(Response<SoloCert>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Announcement>>>> GetAnnouncements()
+    public async Task<ActionResult<Response<IList<SoloCert>>>> GetSoloCerts()
     {
         try
         {
-            return Ok(await _announcementRepository.GetAnnouncements());
+            return Ok(await _soloCertRepository.GetSoloCerts());
         }
         catch (Exception ex)
         {
@@ -85,17 +94,27 @@ public class AnnouncementsController : ControllerBase
         }
     }
 
-    [HttpGet("{announcementId:int}")]
-    [SwaggerResponse(200, "Got announcements", typeof(Response<Announcement>))]
-    [SwaggerResponse(400, "Announcement not found")]
+    [HttpGet("{userId:int}")]
+    // todo auth
+    [SwaggerResponse(200, "Got solo cert", typeof(Response<SoloCert>))]
+    [SwaggerResponse(404, "User or solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Announcement>>> GetAnnouncement(int announcementId)
+    public async Task<ActionResult<Response<SoloCert>>> GetSoloCert(int userId)
     {
         try
         {
-            return Ok(await _announcementRepository.GetAnnouncement(announcementId));
+            return Ok(await _soloCertRepository.GetSoloCert(userId));
         }
-        catch (AnnouncementNotFoundException ex)
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
+        }
+        catch (SoloCertNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -114,37 +133,18 @@ public class AnnouncementsController : ControllerBase
 
     #region Update
 
-    [HttpPut]
+    [HttpPut("{soloCertId:int}/{end:DateTime}")]
     // todo auth
-    [SwaggerResponse(200, "Updated announcement", typeof(Response<Announcement>))]
-    [SwaggerResponse(404, "User or announcement not found")]
+    [SwaggerResponse(200, "Updated solo cert", typeof(Response<SoloCert>))]
+    [SwaggerResponse(404, "User or solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Announcement>>> UpdateAnnouncement([FromBody] Announcement announcement)
+    public async Task<ActionResult<Response<SoloCert>>> ExtendSoloCert(int soloCertId, DateTimeOffset end)
     {
         try
         {
-            var result = await _validator.ValidateAsync(announcement);
-            if (!result.IsValid)
-            {
-                return BadRequest(new Response<IList<ValidationFailure>>
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = "Validation error",
-                    Data = result.Errors
-                });
-            }
-            return Ok(await _announcementRepository.UpdateAnnouncement(announcement, Request));
+            return Ok(await _soloCertRepository.ExtendSoloCert(soloCertId, end, Request));
         }
-        catch (UserNotFoundException ex)
-        {
-            return NotFound(new Response<string>
-            {
-                StatusCode = HttpStatusCode.NotFound,
-                Message = ex.Message,
-                Data = string.Empty
-            });
-        }
-        catch (AnnouncementNotFoundException ex)
+        catch (SoloCertNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -163,18 +163,18 @@ public class AnnouncementsController : ControllerBase
 
     #region Delete
 
-    [HttpDelete("{AnnouncementId:int}")]
+    [HttpDelete("{soloCertId:int}")]
     // todo auth
-    [SwaggerResponse(200, "Deleted announcement", typeof(Response<Announcement>))]
-    [SwaggerResponse(404, "News not found")]
+    [SwaggerResponse(200, "Deleted solo cert", typeof(Response<SoloCert>))]
+    [SwaggerResponse(404, "Solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<Announcement>>> DeleteAnnouncement(int announcementId)
+    public async Task<ActionResult<Response<SoloCert>>> DeletSoloCert(int soloCertId)
     {
         try
         {
-            return Ok(await _announcementRepository.DeleteAnnouncement(announcementId, Request));
+            return Ok(await _soloCertRepository.DeleteSoloCert(soloCertId, Request));
         }
-        catch (AnnouncementNotFoundException ex)
+        catch (SoloCertNotFoundException ex)
         {
             return NotFound(new Response<string>
             {

@@ -1,6 +1,9 @@
 ﻿using Amazon.Runtime.Internal;
+using Amazon.Runtime.Internal.Util;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using Sentry;
 using System.Net;
 using ZDC.Server.Data;
 using ZDC.Server.Extensions;
@@ -15,12 +18,14 @@ namespace ZDC.Server.Repositories;
 public class EventRepository : IEventRepository
 {
     private readonly DatabaseContext _context;
+    private readonly IDistributedCache _cache;
     private readonly ILoggingService _loggingService;
     private readonly IEmailService _emailService;
 
-    public EventRepository(DatabaseContext context, ILoggingService loggingService, IEmailService emailService)
+    public EventRepository(DatabaseContext context, IDistributedCache cache, ILoggingService loggingService, IEmailService emailService)
     {
         _context = context;
+        _cache = cache;
         _loggingService = loggingService;
         _emailService = emailService;
     }
@@ -99,35 +104,60 @@ public class EventRepository : IEventRepository
 
     public async Task<Response<IList<Event>>> GetEvents(HttpRequest request)
     {
-        var events = await _context.Events
+        var cachedEvents = await _cache.GetStringAsync("_events");
+        if (!string.IsNullOrEmpty(cachedEvents))
+        {
+            var events = JsonConvert.DeserializeObject<IList<Event>>(cachedEvents);
+            if (events != null)
+            {
+                if (!await request.HttpContext.IsStaff(_context))
+                    events = events.Where(x => x.Open).ToList();
+                return new Response<IList<Event>>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = $"Got {events.Count} events",
+                    Data = events
+                };
+            }
+        }
+
+        var result = await _context.Events
             .Include(x => x.Upload)
             .Include(x => x.Positions)
             .ToListAsync();
+        var expiryOptions = new DistributedCacheEntryOptions()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
+            SlidingExpiration = TimeSpan.FromMinutes(1)
+        };
+        await _cache.SetStringAsync("_events", JsonConvert.SerializeObject(result), expiryOptions);
+
         if (!await request.HttpContext.IsStaff(_context))
-            events = events.Where(x => x.Open).ToList();
+            result = result.Where(x => x.Open).ToList();
+
         return new Response<IList<Event>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {events.Count} events",
-            Data = events
+            Message = $"Got {result.Count} events",
+            Data = result
         };
     }
 
     public async Task<Response<Event>> GetEvent(int eventId, HttpRequest request)
     {
-        var @event = await _context.Events
+        var result = await _context.Events
             .Include(x => x.Upload)
             .Include(x => x.Positions)
             .FirstOrDefaultAsync(x => x.Id == eventId) ??
             throw new EventNotFoundException($"Event '{eventId}' not found");
-        if (!await request.HttpContext.IsStaff(_context) && !@event.Open)
+        if (!await request.HttpContext.IsStaff(_context) && !result.Open)
             throw new EventNotFoundException($"Event '{eventId}' not found");
 
         return new Response<Event>
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Got event '{eventId}'",
-            Data = @event
+            Data = result
         };
     }
 
@@ -138,16 +168,15 @@ public class EventRepository : IEventRepository
             .Include(x => x.Positions)
             .FirstOrDefaultAsync(x => x.Id == eventId) ??
             throw new EventNotFoundException($"Event '{eventId}' not found");
-
-        var registrations = await _context.EventsRegistrations
+        var result = await _context.EventsRegistrations
             .Where(x => x.EventId == @event.Id)
             .ToListAsync();
 
         return new Response<IList<EventRegistration>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {registrations.Count} event registrations",
-            Data = registrations
+            Message = $"Got {result.Count} event registrations",
+            Data = result
         };
     }
 

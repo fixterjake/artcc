@@ -140,9 +140,23 @@ public class PositionNotFoundException : Exception
     }
 }
 
+public class StaffingRequestNotFoundException : Exception
+{
+    public StaffingRequestNotFoundException(string message) : base(message)
+    {
+    }
+}
+
 public class InvalidZdcOperationException : Exception
 {
     public InvalidZdcOperationException(string message) : base(message)
+    {
+    }
+}
+
+public class SoloCertExistsException : Exception
+{
+    public SoloCertExistsException(string message) : base(message)
     {
     }
 }

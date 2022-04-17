@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System.Net;
 using ZDC.Server.Data;
@@ -13,14 +14,16 @@ namespace ZDC.Server.Repositories;
 public class FeedbackRepository : IFeedbackRepository
 {
     private readonly DatabaseContext _context;
+    private readonly IDistributedCache _cache;
     private readonly ILoggingService _loggingService;
     private readonly INotificationRepository _notificationRepository;
     private readonly IConfiguration _configuration;
 
-    public FeedbackRepository(DatabaseContext context, ILoggingService loggingService,
+    public FeedbackRepository(DatabaseContext context, IDistributedCache cache, ILoggingService loggingService,
         INotificationRepository notificationRepository, IConfiguration configuration)
     {
         _context = context;
+        _cache = cache;
         _loggingService = loggingService;
         _notificationRepository = notificationRepository;
         _configuration = configuration;
@@ -54,7 +57,27 @@ public class FeedbackRepository : IFeedbackRepository
 
     public async Task<Response<IList<Feedback>>> GetFeedback()
     {
+        var cachedFeedback = await _cache.GetStringAsync("_feedback");
+        if (!string.IsNullOrEmpty(cachedFeedback))
+        {
+            var feedback = JsonConvert.DeserializeObject<List<Feedback>>(cachedFeedback);
+            if (feedback != null)
+                return new Response<IList<Feedback>>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = $"Got {feedback.Count} feedback",
+                    Data = feedback
+                };
+        }
+
         var result = await _context.Feedback.ToListAsync();
+        var expiryOptions = new DistributedCacheEntryOptions()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
+            SlidingExpiration = TimeSpan.FromMinutes(1)
+        };
+        await _cache.SetStringAsync("_feedback", JsonConvert.SerializeObject(result), expiryOptions);
+
         return new Response<IList<Feedback>>
         {
             StatusCode = HttpStatusCode.OK,
@@ -69,6 +92,7 @@ public class FeedbackRepository : IFeedbackRepository
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == feedbackId) ??
             throw new FeedbackNotFoundException($"Feedback '{feedbackId}' not found");
+
         return new Response<Feedback>
         {
             StatusCode = HttpStatusCode.OK,

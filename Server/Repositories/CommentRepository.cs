@@ -1,5 +1,7 @@
 ﻿using System.Net;
+using Amazon.Runtime.Internal.Util;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using ZDC.Server.Data;
 using ZDC.Server.Repositories.Interfaces;
@@ -13,11 +15,13 @@ namespace ZDC.Server.Repositories;
 public class CommentRepository : ICommentRepository
 {
     private readonly DatabaseContext _context;
+    private readonly IDistributedCache _cache;
     private readonly ILoggingService _loggingService;
 
-    public CommentRepository(DatabaseContext context, ILoggingService loggingService)
+    public CommentRepository(DatabaseContext context, IDistributedCache cache, ILoggingService loggingService)
     {
         _context = context;
+        _cache = cache;
         _loggingService = loggingService;
     }
 
@@ -47,13 +51,13 @@ public class CommentRepository : ICommentRepository
     {
         if (!_context.Users.Any(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
+        var result = await _context.Comments.Where(x => x.UserId == userId).ToListAsync();
 
-        var comments = await _context.Comments.Where(x => x.UserId == userId).ToListAsync();
         return new Response<IList<Comment>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {comments.Count} comments",
-            Data = comments
+            Message = $"Got {result.Count} comments",
+            Data = result
         };
     }
 
