@@ -65,11 +65,11 @@ public class CommentsController : ControllerBase
     [SwaggerResponse(200, "Got user comments", typeof(Response<IList<Comment>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Comment>>>> GetUserComments(int userId)
+    public async Task<ActionResult<Response<IList<Comment>>>> GetUserComments(int userId, int skip = 0, int take = 10)
     {
         try
         {
-            return Ok(await _commentRepository.GetUserComments(userId));
+            return Ok(await _commentRepository.GetUserComments(userId, skip, take));
         }
         catch (AirportNotFoundException ex)
         {

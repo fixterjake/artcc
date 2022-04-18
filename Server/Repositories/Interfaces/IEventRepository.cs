@@ -36,9 +36,11 @@ public interface IEventRepository
     /// <summary>
     /// Get events
     /// </summary>
+    /// <param name="skip">Number to skip</param>
+    /// <param name="take">Number to take</param>
     /// <param name="request">Raw http request</param>
     /// <returns>Events</returns>
-    Task<Response<IList<Event>>> GetEvents(HttpRequest request);
+    Task<Response<IList<Event>>> GetEvents(int skip, int take, HttpRequest request);
 
     /// <summary>
     /// Get event by id

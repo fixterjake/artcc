@@ -26,12 +26,12 @@ public class ControllerLogRepository : IControllerLogRepository
     }
 
     /// <inheritdoc />
-    public async Task<Response<IList<ControllerLogDto>>> GetUserControllerLogs(int userId)
+    public async Task<Response<IList<ControllerLogDto>>> GetUserControllerLogs(int userId, int skip, int take)
     {
         if (!_context.Users.Any(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
 
-        var cachedControllerLogs = await _cache.GetStringAsync($"_controllerlogs_{userId}");
+        var cachedControllerLogs = await _cache.GetStringAsync($"_controllerlogs_{userId}_{skip}_{take}");
         if (!string.IsNullOrEmpty(cachedControllerLogs))
         {
             var controllerLogs = JsonConvert.DeserializeObject<IList<ControllerLog>>(cachedControllerLogs);
@@ -44,13 +44,16 @@ public class ControllerLogRepository : IControllerLogRepository
                 };
         }
 
-        var result = await _context.ControllerLogs.Where(x => x.UserId == userId).ToListAsync();
+        var result = await _context.ControllerLogs
+            .Where(x => x.UserId == userId)
+            .Skip(skip).Take(take)
+            .ToListAsync();
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync($"_controllerlogs_{userId}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_controllerlogs_{userId}_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
 
         return new Response<IList<ControllerLogDto>>
         {

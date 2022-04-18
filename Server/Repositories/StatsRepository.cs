@@ -28,6 +28,12 @@ public class StatsRepository : IStatsRepository
     /// <inheritdoc />
     public async Task<Response<IList<StatsDto>>> GetStats(int month, int year)
     {
+        if (month == 0 || year == 0)
+        {
+            month = DateTimeOffset.UtcNow.Month;
+            year = DateTimeOffset.UtcNow.Year;
+        }
+
         var cachedStats = await _cache.GetStringAsync($"_stats_{month}_{year}");
         if (!string.IsNullOrEmpty(cachedStats))
         {

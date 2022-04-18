@@ -73,11 +73,11 @@ public class AnnouncementsController : ControllerBase
     [HttpGet]
     [SwaggerResponse(200, "Got all announcements", typeof(Response<IList<Announcement>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Announcement>>>> GetAnnouncements()
+    public async Task<ActionResult<Response<IList<Announcement>>>> GetAnnouncements(int skip = 0, int take = 10)
     {
         try
         {
-            return Ok(await _announcementRepository.GetAnnouncements());
+            return Ok(await _announcementRepository.GetAnnouncements(skip, take));
         }
         catch (Exception ex)
         {

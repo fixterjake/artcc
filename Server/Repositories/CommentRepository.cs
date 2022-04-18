@@ -49,11 +49,14 @@ public class CommentRepository : ICommentRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Comment>>> GetUserComments(int userId)
+    public async Task<Response<IList<Comment>>> GetUserComments(int userId, int skip, int take)
     {
         if (!_context.Users.Any(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
-        var result = await _context.Comments.Where(x => x.UserId == userId).ToListAsync();
+        var result = await _context.Comments
+            .Where(x => x.UserId == userId)
+            .Skip(skip).Take(take)
+            .ToListAsync();
 
         return new Response<IList<Comment>>
         {

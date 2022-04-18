@@ -72,7 +72,7 @@ public class OtsController : ControllerBase
     // todo auth
     [SwaggerResponse(200, "Got all ots's", typeof(Response<IList<Ots>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Ots>>>> GetOts(int skip, int take, OtsStatus status)
+    public async Task<ActionResult<Response<IList<Ots>>>> GetOts(int skip = 0, int take = 10, OtsStatus status = OtsStatus.Pending)
     {
         try
         {

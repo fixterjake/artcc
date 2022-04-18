@@ -162,9 +162,9 @@ public class NotificationRepository : INotificationRepository
             throw new UserNotFoundException("User not found");
 
         var notifications = await _context.Notifications
-            .Skip(skip).Take(take)
             .Where(x => !x.Read)
             .Where(x => x.UserId == user.Id)
+            .Skip(skip).Take(take)
             .ToListAsync();
 
         return new Response<IList<Notification>>

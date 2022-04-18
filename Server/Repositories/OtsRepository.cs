@@ -64,8 +64,8 @@ public class OtsRepository : IOtsRepository
     public async Task<Response<IList<Ots>>> GetOts(int skip, int take, OtsStatus status)
     {
         var ots = await _context.Ots
-            .Skip(skip).Take(take)
             .Where(x => x.Status == status)
+            .Skip(skip).Take(take)
             .Include(x => x.User)
             .Include(x => x.Instructor)
             .Include(x => x.Recommender)

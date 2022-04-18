@@ -100,6 +100,7 @@ builder.Services.AddTransient<IOtsRepository, OtsRepository>();
 builder.Services.AddTransient<IPositionRepository, PositionRepository>();
 builder.Services.AddTransient<ISoloCertRepository, SoloCertRepository>();
 builder.Services.AddTransient<IStaffingRequestRepository, StaffingRequestRepository>();
+builder.Services.AddTransient<ITrainingTicketRepository, TrainingTicketRepository>();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 

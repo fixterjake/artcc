@@ -150,11 +150,11 @@ public class EventsController : ControllerBase
     [HttpGet]
     [SwaggerResponse(200, "Got all events", typeof(Response<IList<Event>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Event>>>> GetEvents()
+    public async Task<ActionResult<Response<IList<Event>>>> GetEvents(int skip = 0, int take = 10)
     {
         try
         {
-            return Ok(await _eventRepository.GetEvents(Request));
+            return Ok(await _eventRepository.GetEvents(skip, take, Request));
         }
         catch (Exception ex)
         {

@@ -63,10 +63,10 @@ public class AnnouncementRepository : IAnnouncementRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Announcement>>> GetAnnouncements()
+    public async Task<Response<IList<Announcement>>> GetAnnouncements(int skip, int take)
     {
 
-        var cachedAnnouncements = await _cache.GetStringAsync("_announcements");
+        var cachedAnnouncements = await _cache.GetStringAsync($"_announcements_{skip}_{take}");
         if (!string.IsNullOrEmpty(cachedAnnouncements))
         {
             var announcements = JsonConvert.DeserializeObject<IList<Announcement>>(cachedAnnouncements);
@@ -79,13 +79,15 @@ public class AnnouncementRepository : IAnnouncementRepository
                 };
         }
 
-        var result = await _context.Announcements.ToListAsync();
+        var result = await _context.Announcements
+            .Skip(skip).Take(take)
+            .ToListAsync();
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync("_announcements", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_announcements_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
 
         return new Response<IList<Announcement>>
         {

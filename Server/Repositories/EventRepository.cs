@@ -106,9 +106,9 @@ public class EventRepository : IEventRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Event>>> GetEvents(HttpRequest request)
+    public async Task<Response<IList<Event>>> GetEvents(int skip, int take, HttpRequest request)
     {
-        var cachedEvents = await _cache.GetStringAsync("_events");
+        var cachedEvents = await _cache.GetStringAsync($"_events_{skip}_{take}");
         if (!string.IsNullOrEmpty(cachedEvents))
         {
             var events = JsonConvert.DeserializeObject<IList<Event>>(cachedEvents);
@@ -126,6 +126,7 @@ public class EventRepository : IEventRepository
         }
 
         var result = await _context.Events
+            .Skip(skip).Take(take)
             .Include(x => x.Upload)
             .Include(x => x.Positions)
             .ToListAsync();
@@ -134,7 +135,7 @@ public class EventRepository : IEventRepository
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync("_events", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_events_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
 
         if (!await request.HttpContext.IsStaff(_context))
             result = result.Where(x => x.Open).ToList();

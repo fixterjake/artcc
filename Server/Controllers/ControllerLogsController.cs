@@ -28,11 +28,11 @@ public class ControllerLogsController : ControllerBase
     [SwaggerResponse(200, "Got user controller logs", typeof(Response<IList<ControllerLogDto>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<ControllerLogDto>>>> GetUserControllerLogs(int userId)
+    public async Task<ActionResult<Response<IList<ControllerLogDto>>>> GetUserControllerLogs(int userId, int skip = 0, int take = 10)
     {
         try
         {
-            return Ok(await _controllerLogRepository.GetUserControllerLogs(userId));
+            return Ok(await _controllerLogRepository.GetUserControllerLogs(userId, skip, take));
         }
         catch (UserNotFoundException ex)
         {
