@@ -60,7 +60,6 @@ jobs:
         SENTRY_PROJECT: server
       with:
         environment: development
-        version: ${{github.ref_name}}
     - name: Create Jobs Release
       uses: getsentry/action-release@v1
       env:
@@ -69,4 +68,3 @@ jobs:
         SENTRY_PROJECT: jobs
       with:
         environment: development
-        version: ${{github.ref_name}}
