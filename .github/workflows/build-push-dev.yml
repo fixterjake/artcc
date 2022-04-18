@@ -1,8 +1,8 @@
 name: Build & Push Dev
 on:
-  create:
-    tags:
-      - 'v*-beta'
+  push:
+    branches:
+        - develop
 jobs:
   DockerBuildPush:
     runs-on: ubuntu-latest
