@@ -58,71 +58,92 @@ public class TrainingTicketRepository : ITrainingTicketRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<TrainingTicket>>> GetTrainingTickets(int skip, int take)
+    public async Task<ResponsePaging<IList<TrainingTicket>>> GetTrainingTickets(int skip, int take)
     {
-        var tickets = await _context.TrainingTickets
+        var result = await _context.TrainingTickets
             .Skip(skip).Take(take)
             .ToListAsync();
-        return new Response<IList<TrainingTicket>>
+        var totalCount = await _context.TrainingTickets.CountAsync();
+
+        return new ResponsePaging<IList<TrainingTicket>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {tickets.Count} training tickets",
-            Data = tickets
+            TotalCount = totalCount,
+            ResultCount = result.Count,
+            Message = $"Got {result.Count} training tickets",
+            Data = result
         };
     }
 
     /// <inheritdoc />
-    public async Task<Response<IList<TrainingTicket>>> GetUserTrainingTickets(int userId, int skip, int take)
+    public async Task<ResponsePaging<IList<TrainingTicket>>> GetUserTrainingTickets(int userId, int skip, int take)
     {
         if (!await _context.Users.AnyAsync(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
 
-        var tickets = await _context.TrainingTickets
-            .Where(x => x.Id == userId)
+        var result = await _context.TrainingTickets
+            .Where(x => x.UserId == userId)
             .Skip(skip).Take(take)
             .ToListAsync();
-        return new Response<IList<TrainingTicket>>
+        var totalCount = await _context.TrainingTickets
+            .Where(x => x.UserId == userId)
+            .CountAsync();
+
+        return new ResponsePaging<IList<TrainingTicket>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {tickets.Count} training tickets",
-            Data = tickets
+            TotalCount = totalCount,
+            ResultCount = result.Count,
+            Message = $"Got {result.Count} training tickets",
+            Data = result
         };
     }
 
     /// <inheritdoc />
-    public async Task<Response<IList<TrainingTicketDto>>> GetUserTrainingTickets(int skip, int take, HttpRequest request)
+    public async Task<ResponsePaging<IList<TrainingTicketDto>>> GetUserTrainingTickets(int skip, int take, HttpRequest request)
     {
         var user = await request.HttpContext.GetUser(_context);
         if (user == null)
             throw new UserNotFoundException("User not found");
 
         var cachedTickets = await _cache.GetStringAsync($"_trainingtickets_{user.Id}");
+        var cachedCount = await _cache.GetStringAsync($"_trainingtickets_{user.Id}_count");
         if (!string.IsNullOrEmpty(cachedTickets))
         {
             var trainingTickets = JsonConvert.DeserializeObject<List<TrainingTicketDto>>(cachedTickets);
+            var count = int.Parse(cachedCount);
             if (trainingTickets != null)
-                return new Response<IList<TrainingTicketDto>>
+                return new ResponsePaging<IList<TrainingTicketDto>>
                 {
                     StatusCode = HttpStatusCode.OK,
+                    TotalCount = count,
+                    ResultCount = trainingTickets.Count,
                     Message = $"Got {trainingTickets.Count} training tickets",
                     Data = trainingTickets
                 };
         }
 
         var result = await _context.TrainingTickets
-            .Where(x => x.Id == user.Id)
+            .Where(x => x.UserId == user.Id)
             .Skip(skip).Take(take)
             .ToListAsync();
+        var totalCount = await _context.TrainingTickets
+            .Where(x => x.UserId == user.Id)
+            .CountAsync();
+
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
         await _cache.SetStringAsync($"_trainingtickets_{user.Id}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_trainingtickets_{user.Id}_count", $"{totalCount}", expiryOptions);
 
-        return new Response<IList<TrainingTicketDto>>
+        return new ResponsePaging<IList<TrainingTicketDto>>
         {
             StatusCode = HttpStatusCode.OK,
+            TotalCount = totalCount,
+            ResultCount = result.Count,
             Message = $"Got {result.Count} training tickets",
             Data = _mapper.Map<IList<TrainingTicket>, IList<TrainingTicketDto>>(result)
         };

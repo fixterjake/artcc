@@ -156,22 +156,27 @@ public class NotificationRepository : INotificationRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Notification>>> GetNotifications(int skip, int take, HttpRequest request)
+    public async Task<ResponsePaging<IList<Notification>>> GetNotifications(int skip, int take, HttpRequest request)
     {
         var user = await request.HttpContext.GetUser(_context) ??
             throw new UserNotFoundException("User not found");
 
-        var notifications = await _context.Notifications
+        var result = await _context.Notifications
             .Where(x => !x.Read)
             .Where(x => x.UserId == user.Id)
             .Skip(skip).Take(take)
             .ToListAsync();
+        var totalCount = await _context.Notifications
+            .Where(x => x.UserId == user.Id)
+            .CountAsync();
 
-        return new Response<IList<Notification>>
+        return new ResponsePaging<IList<Notification>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {notifications.Count} notifications",
-            Data = notifications
+            TotalCount = totalCount,
+            ResultCount = result.Count,
+            Message = $"Got {result.Count} notifications",
+            Data = result
         };
     }
 

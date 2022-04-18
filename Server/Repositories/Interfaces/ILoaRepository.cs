@@ -17,7 +17,7 @@ public interface ILoaRepository
     /// Get loas
     /// </summary>
     /// <returns>Loas</returns>
-    Task<Response<IList<Loa>>> GetLoas(int skip, int take);
+    Task<ResponsePaging<IList<Loa>>> GetLoas(int skip, int take);
 
     /// <summary>
     /// Get loa by id

@@ -18,7 +18,7 @@ public interface IOtsRepository
     /// Get ots's
     /// </summary>
     /// <returns>Ots's</returns>
-    Task<Response<IList<Ots>>> GetOts(int skip, int take, OtsStatus status);
+    Task<ResponsePaging<IList<Ots>>> GetOts(int skip, int take, OtsStatus status);
 
     /// <summary>
     /// Get ots by id

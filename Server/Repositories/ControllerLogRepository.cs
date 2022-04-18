@@ -26,19 +26,23 @@ public class ControllerLogRepository : IControllerLogRepository
     }
 
     /// <inheritdoc />
-    public async Task<Response<IList<ControllerLogDto>>> GetUserControllerLogs(int userId, int skip, int take)
+    public async Task<ResponsePaging<IList<ControllerLogDto>>> GetUserControllerLogs(int userId, int skip, int take)
     {
         if (!_context.Users.Any(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
 
         var cachedControllerLogs = await _cache.GetStringAsync($"_controllerlogs_{userId}_{skip}_{take}");
+        var cachedCount = await _cache.GetStringAsync($"_controllerlogs_{userId}_count");
         if (!string.IsNullOrEmpty(cachedControllerLogs))
         {
             var controllerLogs = JsonConvert.DeserializeObject<IList<ControllerLog>>(cachedControllerLogs);
+            var count = int.Parse(cachedCount);
             if (controllerLogs != null)
-                return new Response<IList<ControllerLogDto>>
+                return new ResponsePaging<IList<ControllerLogDto>>
                 {
                     StatusCode = HttpStatusCode.OK,
+                    TotalCount = count,
+                    ResultCount = controllerLogs.Count,
                     Message = $"Got {controllerLogs.Count} controller logs for user '{userId}'",
                     Data = _mapper.Map<IList<ControllerLog>, IList<ControllerLogDto>>(controllerLogs)
                 };
@@ -48,16 +52,21 @@ public class ControllerLogRepository : IControllerLogRepository
             .Where(x => x.UserId == userId)
             .Skip(skip).Take(take)
             .ToListAsync();
+        var totalCount = await _context.ControllerLogs.CountAsync();
+
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
         await _cache.SetStringAsync($"_controllerlogs_{userId}_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_controllerlogs_{userId}_count", $"{totalCount}", expiryOptions);
 
-        return new Response<IList<ControllerLogDto>>
+        return new ResponsePaging<IList<ControllerLogDto>>
         {
             StatusCode = HttpStatusCode.OK,
+            TotalCount = totalCount,
+            ResultCount = result.Count,
             Message = $"Got {result.Count} controller logs for user '{userId}'",
             Data = _mapper.Map<IList<ControllerLog>, IList<ControllerLogDto>>(result)
         };

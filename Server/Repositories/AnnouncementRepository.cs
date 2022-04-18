@@ -63,17 +63,21 @@ public class AnnouncementRepository : IAnnouncementRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Announcement>>> GetAnnouncements(int skip, int take)
+    public async Task<ResponsePaging<IList<Announcement>>> GetAnnouncements(int skip, int take)
     {
 
         var cachedAnnouncements = await _cache.GetStringAsync($"_announcements_{skip}_{take}");
+        var cachedCount = await _cache.GetStringAsync("_announcements_count");
         if (!string.IsNullOrEmpty(cachedAnnouncements))
         {
             var announcements = JsonConvert.DeserializeObject<IList<Announcement>>(cachedAnnouncements);
+            var count = int.Parse(cachedCount);
             if (announcements != null)
-                return new Response<IList<Announcement>>
+                return new ResponsePaging<IList<Announcement>>
                 {
                     StatusCode = HttpStatusCode.OK,
+                    TotalCount = count,
+                    ResultCount = announcements.Count,
                     Message = $"Got {announcements.Count} announcements",
                     Data = announcements
                 };
@@ -82,16 +86,20 @@ public class AnnouncementRepository : IAnnouncementRepository
         var result = await _context.Announcements
             .Skip(skip).Take(take)
             .ToListAsync();
+        var totalCount = await _context.Announcements.CountAsync();
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
         await _cache.SetStringAsync($"_announcements_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync("_announcements_count", $"{totalCount}", expiryOptions);
 
-        return new Response<IList<Announcement>>
+        return new ResponsePaging<IList<Announcement>>
         {
             StatusCode = HttpStatusCode.OK,
+            TotalCount = totalCount,
+            ResultCount = result.Count,
             Message = $"Got {result.Count} announcements",
             Data = result
         };

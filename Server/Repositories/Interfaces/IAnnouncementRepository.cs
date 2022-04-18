@@ -20,7 +20,7 @@ public interface IAnnouncementRepository
     /// <param name="skip">Number to skip</param>
     /// <param name="take">Number to take</param>
     /// <returns>All announcements</returns>
-    Task<Response<IList<Announcement>>> GetAnnouncements(int skip, int take);
+    Task<ResponsePaging<IList<Announcement>>> GetAnnouncements(int skip, int take);
 
     /// <summary>
     /// Get announcement by id

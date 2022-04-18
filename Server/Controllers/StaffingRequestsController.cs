@@ -62,9 +62,9 @@ public class StaffingRequestsController : ControllerBase
 
     [HttpGet]
     // todo auth
-    [SwaggerResponse(200, "Got all staffing requests", typeof(Response<IList<StaffingRequest>>))]
+    [SwaggerResponse(200, "Got all staffing requests", typeof(ResponsePaging<IList<StaffingRequest>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<StaffingRequest>>>> GetStaffingRequests(int skip = 0, int take = 10,
+    public async Task<ActionResult<ResponsePaging<IList<StaffingRequest>>>> GetStaffingRequests(int skip = 0, int take = 10,
         StaffingRequestStatus status = StaffingRequestStatus.Pending)
     {
         try

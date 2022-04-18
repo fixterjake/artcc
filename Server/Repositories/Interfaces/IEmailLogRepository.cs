@@ -11,5 +11,5 @@ public interface IEmailLogRepository
     /// <param name="skip">Number to skip</param>
     /// <param name="take">Number to take</param>
     /// <returns>Email logs</returns>
-    Task<Response<IList<EmailLog>>> GetEmailLogs(int skip, int take);
+    Task<ResponsePaging<IList<EmailLog>>> GetEmailLogs(int skip, int take);
 }

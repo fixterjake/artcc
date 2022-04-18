@@ -40,7 +40,7 @@ public interface IEventRepository
     /// <param name="take">Number to take</param>
     /// <param name="request">Raw http request</param>
     /// <returns>Events</returns>
-    Task<Response<IList<Event>>> GetEvents(int skip, int take, HttpRequest request);
+    Task<ResponsePaging<IList<Event>>> GetEvents(int skip, int take, HttpRequest request);
 
     /// <summary>
     /// Get event by id

@@ -148,9 +148,9 @@ public class EventsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all events", typeof(Response<IList<Event>>))]
+    [SwaggerResponse(200, "Got all events", typeof(ResponsePaging<IList<Event>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Event>>>> GetEvents(int skip = 0, int take = 10)
+    public async Task<ActionResult<ResponsePaging<IList<Event>>>> GetEvents(int skip = 0, int take = 10)
     {
         try
         {

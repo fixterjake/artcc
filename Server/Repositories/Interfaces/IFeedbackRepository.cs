@@ -20,7 +20,7 @@ public interface IFeedbackRepository
     /// <param name="skip">Number to skip</param>
     /// <param name="take">Number to take</param>
     /// <returns>Feedback</returns>
-    Task<Response<IList<Feedback>>> GetFeedback(int skip, int take);
+    Task<ResponsePaging<IList<Feedback>>> GetFeedback(int skip, int take);
 
     /// <summary>
     /// Get feedback by id

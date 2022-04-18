@@ -53,7 +53,7 @@ public interface INotificationRepository
     /// <param name="request">Raw http request</param>
     /// <exception cref="Shared.UserNotFoundException">User not found</exception>
     /// <returns>Notifications</returns>
-    Task<Response<IList<Notification>>> GetNotifications(int skip, int take, HttpRequest request);
+    Task<ResponsePaging<IList<Notification>>> GetNotifications(int skip, int take, HttpRequest request);
 
     /// <summary>
     /// Set a notification as read

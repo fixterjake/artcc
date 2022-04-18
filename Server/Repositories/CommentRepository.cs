@@ -49,7 +49,7 @@ public class CommentRepository : ICommentRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Comment>>> GetUserComments(int userId, int skip, int take)
+    public async Task<ResponsePaging<IList<Comment>>> GetUserComments(int userId, int skip, int take)
     {
         if (!_context.Users.Any(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
@@ -57,10 +57,13 @@ public class CommentRepository : ICommentRepository
             .Where(x => x.UserId == userId)
             .Skip(skip).Take(take)
             .ToListAsync();
+        var totalCount = await _context.Comments.CountAsync();
 
-        return new Response<IList<Comment>>
+        return new ResponsePaging<IList<Comment>>
         {
             StatusCode = HttpStatusCode.OK,
+            TotalCount = totalCount,
+            ResultCount = result.Count,
             Message = $"Got {result.Count} comments",
             Data = result
         };

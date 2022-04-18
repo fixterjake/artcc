@@ -60,32 +60,40 @@ public class FeedbackRepository : IFeedbackRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Feedback>>> GetFeedback(int skip, int take)
+    public async Task<ResponsePaging<IList<Feedback>>> GetFeedback(int skip, int take)
     {
         var cachedFeedback = await _cache.GetStringAsync($"_feedback_{skip}_{take}");
+        var cachedCount = await _cache.GetStringAsync($"_feedback_{skip}_{take}");
         if (!string.IsNullOrEmpty(cachedFeedback))
         {
             var feedback = JsonConvert.DeserializeObject<List<Feedback>>(cachedFeedback);
+            var count = int.Parse(cachedCount);
             if (feedback != null)
-                return new Response<IList<Feedback>>
+                return new ResponsePaging<IList<Feedback>>
                 {
                     StatusCode = HttpStatusCode.OK,
+                    TotalCount = count,
+                    ResultCount = feedback.Count,
                     Message = $"Got {feedback.Count} feedback",
                     Data = feedback
                 };
         }
 
         var result = await _context.Feedback.Skip(skip).Take(take).ToListAsync();
+        var totalCount = await _context.Feedback.CountAsync();
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
         await _cache.SetStringAsync($"_feedback_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_feedback_count", $"{totalCount}", expiryOptions);
 
-        return new Response<IList<Feedback>>
+        return new ResponsePaging<IList<Feedback>>
         {
             StatusCode = HttpStatusCode.OK,
+            TotalCount = totalCount,
+            ResultCount = result.Count,
             Message = $"Got {result.Count} feedback",
             Data = result
         };

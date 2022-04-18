@@ -62,10 +62,10 @@ public class CommentsController : ControllerBase
 
     [HttpGet("{userId:int}")]
     // todo auth
-    [SwaggerResponse(200, "Got user comments", typeof(Response<IList<Comment>>))]
+    [SwaggerResponse(200, "Got user comments", typeof(ResponsePaging<IList<Comment>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Comment>>>> GetUserComments(int userId, int skip = 0, int take = 10)
+    public async Task<ActionResult<ResponsePaging<IList<Comment>>>> GetUserComments(int userId, int skip = 0, int take = 10)
     {
         try
         {

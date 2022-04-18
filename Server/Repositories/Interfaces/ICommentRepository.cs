@@ -21,7 +21,7 @@ public interface ICommentRepository
     /// <param name="take">Number to take</param>
     /// <exception cref="Shared.UserNotFoundException">User not found</exception>
     /// <returns>User comments</returns>
-    Task<Response<IList<Comment>>> GetUserComments(int userId, int skip, int take);
+    Task<ResponsePaging<IList<Comment>>> GetUserComments(int userId, int skip, int take);
 
     /// <summary>
     /// Update a comment

@@ -106,19 +106,28 @@ public class EventRepository : IEventRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Event>>> GetEvents(int skip, int take, HttpRequest request)
+    public async Task<ResponsePaging<IList<Event>>> GetEvents(int skip, int take, HttpRequest request)
     {
         var cachedEvents = await _cache.GetStringAsync($"_events_{skip}_{take}");
+        var cachedCount = await _cache.GetStringAsync($"_events_count");
         if (!string.IsNullOrEmpty(cachedEvents))
         {
             var events = JsonConvert.DeserializeObject<IList<Event>>(cachedEvents);
+            var count = int.Parse(cachedCount);
             if (events != null)
             {
                 if (!await request.HttpContext.IsStaff(_context))
-                    events = events.Where(x => x.Open).ToList();
-                return new Response<IList<Event>>
+                    foreach (var entry in events)
+                        if (!entry.Open)
+                        {
+                            events.Remove(entry);
+                            count--;
+                        }
+                return new ResponsePaging<IList<Event>>
                 {
                     StatusCode = HttpStatusCode.OK,
+                    TotalCount = count,
+                    ResultCount = events.Count,
                     Message = $"Got {events.Count} events",
                     Data = events
                 };
@@ -130,19 +139,29 @@ public class EventRepository : IEventRepository
             .Include(x => x.Upload)
             .Include(x => x.Positions)
             .ToListAsync();
+        var totalCount = await _context.Events.CountAsync();
+
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
         await _cache.SetStringAsync($"_events_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_events_count", $"{totalCount}", expiryOptions);
 
         if (!await request.HttpContext.IsStaff(_context))
-            result = result.Where(x => x.Open).ToList();
+            foreach (var entry in result)
+                if (!entry.Open)
+                {
+                    result.Remove(entry);
+                    totalCount--;
+                }
 
-        return new Response<IList<Event>>
+        return new ResponsePaging<IList<Event>>
         {
             StatusCode = HttpStatusCode.OK,
+            TotalCount = totalCount,
+            ResultCount = result.Count,
             Message = $"Got {result.Count} events",
             Data = result
         };

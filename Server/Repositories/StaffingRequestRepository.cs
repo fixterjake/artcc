@@ -54,15 +54,21 @@ public class StaffingRequestRepository : IStaffingRequestRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<StaffingRequest>>> GetStaffingRequests(int skip, int take, StaffingRequestStatus status)
+    public async Task<ResponsePaging<IList<StaffingRequest>>> GetStaffingRequests(int skip, int take, StaffingRequestStatus status)
     {
         var result = await _context.StaffingRequests
             .Where(x => x.Status == status)
             .Skip(skip).Take(take)
             .ToListAsync();
-        return new Response<IList<StaffingRequest>>
+        var totalCount = await _context.StaffingRequests
+            .Where(x => x.Status == status)
+            .CountAsync();
+
+        return new ResponsePaging<IList<StaffingRequest>>
         {
             StatusCode = HttpStatusCode.OK,
+            TotalCount = totalCount,
+            ResultCount = result.Count,
             Message = $"Got {result.Count} staffing requests",
             Data = result
         };

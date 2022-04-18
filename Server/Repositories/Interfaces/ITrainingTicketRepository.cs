@@ -20,7 +20,7 @@ public interface ITrainingTicketRepository
     /// <param name="skip">Number to skip<param>
     /// <param name="take">Number to take</param>
     /// <returns>Training tickets</returns>
-    Task<Response<IList<TrainingTicket>>> GetTrainingTickets(int skip, int take);
+    Task<ResponsePaging<IList<TrainingTicket>>> GetTrainingTickets(int skip, int take);
 
     /// <summary>
     /// Get user training tickets
@@ -30,7 +30,7 @@ public interface ITrainingTicketRepository
     /// <param name="take">Number to take</param>
     /// <exception cref="Shared.UserNotFoundException">User not found</exception>
     /// <returns>User training tickets</returns>
-    Task<Response<IList<TrainingTicket>>> GetUserTrainingTickets(int userId, int skip, int take);
+    Task<ResponsePaging<IList<TrainingTicket>>> GetUserTrainingTickets(int userId, int skip, int take);
 
     /// <summary>
     /// Get user training tickets
@@ -40,7 +40,7 @@ public interface ITrainingTicketRepository
     /// <param name="request">Raw http request</param>
     /// <exception cref="Shared.UserNotFoundException">User not found</exception>
     /// <returns>User training tickets</returns>
-    Task<Response<IList<TrainingTicketDto>>> GetUserTrainingTickets(int skip, int take, HttpRequest request);
+    Task<ResponsePaging<IList<TrainingTicketDto>>> GetUserTrainingTickets(int skip, int take, HttpRequest request);
 
     /// <summary>
     /// Get training ticket by id

@@ -55,17 +55,20 @@ public class LoaRepository : ILoaRepository
     #region Read
 
     /// <inheritdoc />
-    public async Task<Response<IList<Loa>>> GetLoas(int skip, int take)
+    public async Task<ResponsePaging<IList<Loa>>> GetLoas(int skip, int take)
     {
-        var loas = await _context.Loas
+        var result = await _context.Loas
             .Skip(skip).Take(take)
             .Include(x => x.User)
             .ToListAsync();
-        return new Response<IList<Loa>>
+        var totalCount = await _context.Loas.CountAsync();
+        return new ResponsePaging<IList<Loa>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {loas.Count} loas",
-            Data = loas
+            TotalCount = totalCount,
+            ResultCount = result.Count,
+            Message = $"Got {result.Count} loas",
+            Data = result
         };
     }
 

@@ -20,7 +20,7 @@ public interface IStaffingRequestRepository
     /// <param name="take">Number to take</param>
     /// <param name="status">Staffing request status</param>
     /// <returns>Staffing requests</returns>
-    Task<Response<IList<StaffingRequest>>> GetStaffingRequests(int skip, int take, StaffingRequestStatus status);
+    Task<ResponsePaging<IList<StaffingRequest>>> GetStaffingRequests(int skip, int take, StaffingRequestStatus status);
 
     /// <summary>
     /// Get staffing request by id

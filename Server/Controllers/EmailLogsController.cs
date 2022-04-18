@@ -24,9 +24,9 @@ public class EmailLogsController : ControllerBase
 
     [HttpGet]
     // todo auth
-    [SwaggerResponse(200, "Got all email logs", typeof(Response<IList<EmailLog>>))]
+    [SwaggerResponse(200, "Got all email logs", typeof(ResponsePaging<IList<EmailLog>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<IList<EmailLog>>> GetEmailLogs(int skip = 0, int take = 10)
+    public async Task<ActionResult<ResponsePaging<IList<EmailLog>>>> GetEmailLogs(int skip = 0, int take = 10)
     {
         try
         {

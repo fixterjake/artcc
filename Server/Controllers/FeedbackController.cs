@@ -73,9 +73,9 @@ public class FeedbackController : ControllerBase
 
     [HttpGet]
     // todo auth
-    [SwaggerResponse(200, "Got all feedback", typeof(Response<IList<Feedback>>))]
+    [SwaggerResponse(200, "Got all feedback", typeof(ResponsePaging<IList<Feedback>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Feedback>>>> GetFeedback(int skip = 0, int take = 10)
+    public async Task<ActionResult<ResponsePaging<IList<Feedback>>>> GetFeedback(int skip = 0, int take = 10)
     {
         try
         {

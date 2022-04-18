@@ -25,10 +25,10 @@ public class NotificationsController : ControllerBase
     }
 
     [HttpGet]
-    [SwaggerResponse(200, "Got notifications", typeof(Response<IList<Notification>>))]
+    [SwaggerResponse(200, "Got notifications", typeof(ResponsePaging<IList<Notification>>))]
     [SwaggerResponse(404, "Airport not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Notification>>>> GetNotifications(int skip = 0, int take = 10)
+    public async Task<ActionResult<ResponsePaging<IList<Notification>>>> GetNotifications(int skip = 0, int take = 10)
     {
         try
         {

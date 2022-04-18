@@ -71,9 +71,9 @@ public class AnnouncementsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all announcements", typeof(Response<IList<Announcement>>))]
+    [SwaggerResponse(200, "Got all announcements", typeof(ResponsePaging<IList<Announcement>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Announcement>>>> GetAnnouncements(int skip = 0, int take = 10)
+    public async Task<ActionResult<ResponsePaging<IList<Announcement>>>> GetAnnouncements(int skip = 0, int take = 10)
     {
         try
         {

@@ -63,9 +63,9 @@ public class LoasController : ControllerBase
 
     [HttpGet]
     // todo auth
-    [SwaggerResponse(200, "Got loas", typeof(Response<IList<Loa>>))]
+    [SwaggerResponse(200, "Got loas", typeof(ResponsePaging<IList<Loa>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Loa>>>> GetLoas(int skip = 0, int take = 10)
+    public async Task<ActionResult<ResponsePaging<IList<Loa>>>> GetLoas(int skip = 0, int take = 10)
     {
         try
         {
