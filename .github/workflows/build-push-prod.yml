@@ -1,8 +1,8 @@
 name: Build & Push Prod
 on:
   create:
-    tags-ignore:
-      - 'v*-beta'
+    tags:
+      - v*
 jobs:
   DockerBuildPush:
     runs-on: ubuntu-latest
