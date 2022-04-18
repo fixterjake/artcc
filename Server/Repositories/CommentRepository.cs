@@ -27,6 +27,7 @@ public class CommentRepository : ICommentRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Comment>> CreateComment(Comment comment, HttpRequest request)
     {
         var result = await _context.Comments.AddAsync(comment);
@@ -47,6 +48,7 @@ public class CommentRepository : ICommentRepository
 
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<Comment>>> GetUserComments(int userId)
     {
         if (!_context.Users.Any(x => x.Id == userId))
@@ -65,6 +67,7 @@ public class CommentRepository : ICommentRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Comment>> UpdateComment(Comment comment, HttpRequest request)
     {
         var dbComment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == comment.Id) ??
@@ -94,6 +97,7 @@ public class CommentRepository : ICommentRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Comment>> DeleteComment(int commentId, HttpRequest request)
     {
         var comment = await _context.Comments.FindAsync(commentId) ??

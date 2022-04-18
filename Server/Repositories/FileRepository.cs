@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal.Util;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System.Net;
@@ -29,6 +28,7 @@ public class FileRepository : IFileRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<File>> CreateFile(File file, HttpRequest request)
     {
         var result = await _context.Files.AddAsync(file);
@@ -50,6 +50,7 @@ public class FileRepository : IFileRepository
 
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<File>>> GetFiles(HttpRequest request)
     {
         var cachedFiles = await _cache.GetStringAsync("_files");
@@ -92,7 +93,7 @@ public class FileRepository : IFileRepository
         };
     }
 
-
+    /// <inheritdoc />
     public async Task<Response<File>> GetFile(int fileId, HttpRequest request)
     {
         var file = await _context.Files.FindAsync(fileId) ??
@@ -114,6 +115,7 @@ public class FileRepository : IFileRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<File>> UpdateFile(File file, HttpRequest request)
     {
         var dbFile = await _context.Files.AsNoTracking().FirstOrDefaultAsync(x => x.Id == file.Id) ??
@@ -139,6 +141,7 @@ public class FileRepository : IFileRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<File>> DeleteFile(int fileId, HttpRequest request)
     {
         var file = await _context.Files.FindAsync(fileId) ??

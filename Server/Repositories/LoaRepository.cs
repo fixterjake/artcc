@@ -29,6 +29,7 @@ public class LoaRepository : ILoaRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Loa>> CreateLoa(Loa loa, HttpRequest request)
     {
         var result = await _context.Loas.AddAsync(loa);
@@ -53,9 +54,11 @@ public class LoaRepository : ILoaRepository
 
     #region Read
 
-    public async Task<Response<IList<Loa>>> GetLoas()
+    /// <inheritdoc />
+    public async Task<Response<IList<Loa>>> GetLoas(int skip, int take)
     {
         var loas = await _context.Loas
+            .Skip(skip).Take(take)
             .Include(x => x.User)
             .ToListAsync();
         return new Response<IList<Loa>>
@@ -66,6 +69,7 @@ public class LoaRepository : ILoaRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<Loa>> GetLoa(int loaId)
     {
         var loa = await _context.Loas
@@ -85,6 +89,7 @@ public class LoaRepository : ILoaRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Loa>> UpdateLoa(Loa loa, HttpRequest request)
     {
         var dbLoa = await _context.Loas.AsNoTracking().FirstOrDefaultAsync(x => x.Id == loa.Id) ??
@@ -111,6 +116,7 @@ public class LoaRepository : ILoaRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Loa>> DeleteLoa(int loaId, HttpRequest request)
     {
         var loa = await _context.Loas.FindAsync(loaId) ??

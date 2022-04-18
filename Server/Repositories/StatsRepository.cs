@@ -25,6 +25,7 @@ public class StatsRepository : IStatsRepository
         _mapper = mapper;
     }
 
+    /// <inheritdoc />
     public async Task<Response<IList<StatsDto>>> GetStats(int month, int year)
     {
         var cachedStats = await _cache.GetStringAsync($"_stats_{month}_{year}");

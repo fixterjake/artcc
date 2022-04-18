@@ -30,6 +30,7 @@ public class SoloCertRepository : ISoloCertRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<SoloCert>> CreateSoloCert(SoloCert soloCert, HttpRequest request)
     {
         var user = await _context.Users.FindAsync(soloCert.UserId) ??
@@ -82,6 +83,7 @@ public class SoloCertRepository : ISoloCertRepository
 
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<SoloCertDto>>> GetSoloCerts()
     {
         var soloCerts = await _context.SoloCerts
@@ -95,6 +97,7 @@ public class SoloCertRepository : ISoloCertRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<SoloCert>> GetSoloCert(int userId)
     {
         var user = await _context.Users.FindAsync(userId) ??
@@ -115,6 +118,7 @@ public class SoloCertRepository : ISoloCertRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<SoloCert>> ExtendSoloCert(int soloCertId, DateTimeOffset newEnd, HttpRequest request)
     {
         var cert = await _context.SoloCerts.FindAsync(soloCertId) ??
@@ -145,6 +149,7 @@ public class SoloCertRepository : ISoloCertRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<SoloCert>> DeleteSoloCert(int soloCertId, HttpRequest request)
     {
         var cert = await _context.SoloCerts.FindAsync(soloCertId) ??

@@ -28,6 +28,7 @@ public class OtsRepository : IOtsRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Ots>> CreateOts(Ots ots, HttpRequest request)
     {
         if (await _context.Users.FindAsync(ots.UserId) == null)
@@ -59,13 +60,15 @@ public class OtsRepository : IOtsRepository
 
     #region Read
 
-    public async Task<Response<IList<Ots>>> GetOts()
+    /// <inheritdoc />
+    public async Task<Response<IList<Ots>>> GetOts(int skip, int take, OtsStatus status)
     {
         var ots = await _context.Ots
+            .Skip(skip).Take(take)
+            .Where(x => x.Status == status)
             .Include(x => x.User)
             .Include(x => x.Instructor)
             .Include(x => x.Recommender)
-            .OrderBy(x => x.Status)
             .OrderBy(x => x.Updated)
             .ToListAsync();
         return new Response<IList<Ots>>
@@ -76,6 +79,7 @@ public class OtsRepository : IOtsRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<Ots>> GetOts(int otsId)
     {
         var ots = await _context.Ots
@@ -97,6 +101,7 @@ public class OtsRepository : IOtsRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Ots>> UpdateOts(Ots ots, HttpRequest request)
     {
         if (await _context.Users.FindAsync(ots.UserId) == null)
@@ -129,6 +134,7 @@ public class OtsRepository : IOtsRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Ots>> DeleteOts(int otsId, HttpRequest request)
     {
         var ots = await _context.Ots.FindAsync(otsId) ??

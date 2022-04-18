@@ -28,28 +28,9 @@ public class UserRepository : IUserRepository
         _mapper = mapper;
     }
 
-    #region Create
-
-    public async Task<Response<User>> CreateUser(User user, HttpRequest request)
-    {
-        var result = await _context.AddAsync(user);
-        await _context.SaveChangesAsync();
-        var newData = JsonConvert.SerializeObject(result.Entity);
-
-        await _loggingService.AddWebsiteLog(request, $"Created user '{result.Entity.Id}'", string.Empty, newData);
-
-        return new Response<User>
-        {
-            StatusCode = HttpStatusCode.Created,
-            Message = $"Created user '{result.Entity.Id}'",
-            Data = result.Entity
-        };
-    }
-
-    #endregion
-
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<UserDto>>> GetUsers()
     {
         var cachedUsers = await _cache.GetStringAsync("_users");
@@ -82,6 +63,7 @@ public class UserRepository : IUserRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<User>> GetUser(int userId)
     {
         var user = await _context.Users
@@ -96,6 +78,7 @@ public class UserRepository : IUserRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<IList<Role>>> GetRoles()
     {
         var roles = await _context.Roles.ToListAsync();
@@ -111,6 +94,7 @@ public class UserRepository : IUserRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<User>> UpdateUser(User user, HttpRequest request)
     {
         var dbUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == user.Id) ??
@@ -131,6 +115,7 @@ public class UserRepository : IUserRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<User>> AddRole(int userId, int roleId, HttpRequest request)
     {
         var user = await _context.Users
@@ -155,6 +140,7 @@ public class UserRepository : IUserRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<User>> RemoveRole(int userId, int roleId, HttpRequest request)
     {
         var user = await _context.Users
@@ -183,6 +169,7 @@ public class UserRepository : IUserRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<User>> DeleteUser(int userId, HttpRequest request)
     {
         var user = await _context.Users.FindAsync(userId) ??

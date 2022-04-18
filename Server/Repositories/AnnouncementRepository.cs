@@ -32,6 +32,7 @@ public class AnnouncementRepository : IAnnouncementRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Announcement>> CreateAnnouncement(Announcement announcement, HttpRequest request)
     {
         var user = await request.HttpContext.GetUser(_context) ??
@@ -61,6 +62,7 @@ public class AnnouncementRepository : IAnnouncementRepository
 
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<Announcement>>> GetAnnouncements()
     {
 
@@ -93,6 +95,7 @@ public class AnnouncementRepository : IAnnouncementRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<Announcement>> GetAnnouncement(int announcementId)
     {
         var result = await _context.Announcements.FindAsync(announcementId) ??
@@ -109,6 +112,7 @@ public class AnnouncementRepository : IAnnouncementRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Announcement>> UpdateAnnouncement(Announcement announcement, HttpRequest request)
     {
         var user = await request.HttpContext.GetUser(_context) ??
@@ -137,6 +141,7 @@ public class AnnouncementRepository : IAnnouncementRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Announcement>> DeleteAnnouncement(int announcementId, HttpRequest request)
     {
         var announcement = await _context.Announcements.FindAsync(announcementId) ??

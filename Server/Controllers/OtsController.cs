@@ -72,11 +72,11 @@ public class OtsController : ControllerBase
     // todo auth
     [SwaggerResponse(200, "Got all ots's", typeof(Response<IList<Ots>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Ots>>>> GetOts()
+    public async Task<ActionResult<Response<IList<Ots>>>> GetOts(int skip, int take, OtsStatus status)
     {
         try
         {
-            return Ok(await _otsRepository.GetOts());
+            return Ok(await _otsRepository.GetOts(skip, take, status));
         }
         catch (Exception ex)
         {

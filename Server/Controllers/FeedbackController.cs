@@ -34,6 +34,7 @@ public class FeedbackController : ControllerBase
     [HttpPost]
     // todo auth
     [SwaggerResponse(200, "Created feedback", typeof(Response<string>))]
+    [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
     public async Task<ActionResult<Response<string>>> CreateFeedback([FromBody] Feedback feedback)
     {
@@ -51,6 +52,15 @@ public class FeedbackController : ControllerBase
             }
             return Ok(await _feedbackRepository.CreateFeedback(feedback, Request));
         }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
+        }
         catch (Exception ex)
         {
             return _sentryHub.CaptureException(ex).ReturnActionResult();
@@ -65,11 +75,11 @@ public class FeedbackController : ControllerBase
     // todo auth
     [SwaggerResponse(200, "Got all feedback", typeof(Response<IList<Feedback>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Feedback>>>> GetFeedback()
+    public async Task<ActionResult<Response<IList<Feedback>>>> GetFeedback(int skip, int take)
     {
         try
         {
-            return Ok(await _feedbackRepository.GetFeedback());
+            return Ok(await _feedbackRepository.GetFeedback(skip, take));
         }
         catch (Exception ex)
         {
@@ -111,7 +121,7 @@ public class FeedbackController : ControllerBase
     [HttpPut]
     // todo auth
     [SwaggerResponse(200, "Updated feedback", typeof(Response<Feedback>))]
-    [SwaggerResponse(404, "Feedback not found")]
+    [SwaggerResponse(404, "Feedback or user not found")]
     [SwaggerResponse(400, "An error occurred")]
     public async Task<ActionResult<Response<Feedback>>> UpdateFeedback([FromBody] Feedback feedback)
     {
@@ -130,6 +140,15 @@ public class FeedbackController : ControllerBase
             return Ok(await _feedbackRepository.UpdateFeedback(feedback, Request));
         }
         catch (FeedbackNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
+        }
+        catch (UserNotFoundException ex)
         {
             return NotFound(new Response<string>
             {

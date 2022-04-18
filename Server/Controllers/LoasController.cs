@@ -65,11 +65,11 @@ public class LoasController : ControllerBase
     // todo auth
     [SwaggerResponse(200, "Got loas", typeof(Response<IList<Loa>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Loa>>>> GetLoas()
+    public async Task<ActionResult<Response<IList<Loa>>>> GetLoas(int skip, int take)
     {
         try
         {
-            return Ok(await _loaRepository.GetLoas());
+            return Ok(await _loaRepository.GetLoas(skip, take));
         }
         catch (Exception ex)
         {

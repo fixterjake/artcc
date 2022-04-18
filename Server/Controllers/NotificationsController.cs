@@ -28,11 +28,11 @@ public class NotificationsController : ControllerBase
     [SwaggerResponse(200, "Got notifications", typeof(Response<IList<Notification>>))]
     [SwaggerResponse(404, "Airport not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Notification>>>> GetNotifications()
+    public async Task<ActionResult<Response<IList<Notification>>>> GetNotifications(int skip, int take)
     {
         try
         {
-            return Ok(await _notificationRepository.GetNotifications(Request));
+            return Ok(await _notificationRepository.GetNotifications(skip, take, Request));
         }
         catch (UserNotFoundException ex)
         {

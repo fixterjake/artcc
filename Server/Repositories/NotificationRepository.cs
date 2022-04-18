@@ -20,6 +20,7 @@ public class NotificationRepository : INotificationRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task AddSeniorStaffNotification(string title, string description, string link)
     {
         var users = await _context.Users
@@ -45,6 +46,7 @@ public class NotificationRepository : INotificationRepository
             });
     }
 
+    /// <inheritdoc />
     public async Task AddStaffNotification(string title, string description, string link)
     {
         var users = await _context.Users
@@ -73,6 +75,7 @@ public class NotificationRepository : INotificationRepository
             });
     }
 
+    /// <inheritdoc />
     public async Task AddTrainingNotification(string title, string description, string link)
     {
         var users = await _context.Users
@@ -99,6 +102,7 @@ public class NotificationRepository : INotificationRepository
             });
     }
 
+    /// <inheritdoc />
     public async Task AddEventsNotification(string title, string description, string link)
     {
         var users = await _context.Users
@@ -126,6 +130,7 @@ public class NotificationRepository : INotificationRepository
             });
     }
 
+    /// <inheritdoc />
     public async Task AddAllNotification(string title, string description, string link)
     {
         var users = await _context.Users.Where(x => x.Status != UserStatus.Removed).ToListAsync();
@@ -139,6 +144,7 @@ public class NotificationRepository : INotificationRepository
             });
     }
 
+    /// <inheritdoc />
     public async Task AddNotification(Notification notification)
     {
         await _context.Notifications.AddAsync(notification);
@@ -149,12 +155,14 @@ public class NotificationRepository : INotificationRepository
 
     #region Read
 
-    public async Task<Response<IList<Notification>>> GetNotifications(HttpRequest request)
+    /// <inheritdoc />
+    public async Task<Response<IList<Notification>>> GetNotifications(int skip, int take, HttpRequest request)
     {
         var user = await request.HttpContext.GetUser(_context) ??
             throw new UserNotFoundException("User not found");
 
         var notifications = await _context.Notifications
+            .Skip(skip).Take(take)
             .Where(x => !x.Read)
             .Where(x => x.UserId == user.Id)
             .ToListAsync();
@@ -171,6 +179,7 @@ public class NotificationRepository : INotificationRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task ReadNotification(int notificationId, HttpRequest request)
     {
         var notification = await _context.Notifications.FindAsync(notificationId) ??

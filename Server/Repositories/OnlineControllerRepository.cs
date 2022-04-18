@@ -15,6 +15,7 @@ public class OnlineControllerRepository : IOnlineControllerRepository
         _context = context;
     }
 
+    /// <inheritdoc />
     public async Task<Response<IList<OnlineController>>> GetOnlineControllers()
     {
         var onlineControllers = await _context.OnlineControllers.ToListAsync();

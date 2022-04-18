@@ -25,6 +25,7 @@ public class ControllerLogRepository : IControllerLogRepository
         _mapper = mapper;
     }
 
+    /// <inheritdoc />
     public async Task<Response<IList<ControllerLogDto>>> GetUserControllerLogs(int userId)
     {
         if (!_context.Users.Any(x => x.Id == userId))

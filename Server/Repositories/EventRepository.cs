@@ -32,6 +32,7 @@ public class EventRepository : IEventRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Event>> CreateEvent(Event @event, HttpRequest request)
     {
         var result = await _context.Events.AddAsync(@event);
@@ -48,6 +49,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<EventPosition>> CreateEventPosition(EventPosition position, int eventId, HttpRequest request)
     {
         var @event = await _context.Events
@@ -71,6 +73,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<EventRegistration>> CreateEventRegistration(EventRegistration registration, HttpRequest request)
     {
         var user = await request.HttpContext.GetUser(_context);
@@ -102,6 +105,7 @@ public class EventRepository : IEventRepository
 
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<Event>>> GetEvents(HttpRequest request)
     {
         var cachedEvents = await _cache.GetStringAsync("_events");
@@ -143,6 +147,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<Event>> GetEvent(int eventId, HttpRequest request)
     {
         var result = await _context.Events
@@ -161,6 +166,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<IList<EventRegistration>>> GetEventRegistrations(int eventId)
     {
         var @event = await _context.Events
@@ -180,6 +186,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<EventRegistration>> GetUserEventRegistration(int eventId, HttpRequest request)
     {
         var registration = await request.HttpContext.GetUserEventRegistration(_context, eventId) ??
@@ -196,6 +203,7 @@ public class EventRepository : IEventRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Event>> UpdateEvent(Event @event, HttpRequest request)
     {
         var dbEvent = await _context.Events.AsNoTracking().FirstOrDefaultAsync(x => x.Id == @event.Id) ??
@@ -217,6 +225,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<EventPosition>> UpdateEventPosition(EventPosition position, HttpRequest request)
     {
         var dbPosition = await _context.EventsPositions.AsNoTracking().FirstOrDefaultAsync(x => x.Id == position.Id) ??
@@ -237,6 +246,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<IList<EventRegistration>>> AssignReliefPositions(int eventId, HttpRequest request)
     {
         var @event = await _context.Events
@@ -273,6 +283,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<EventRegistration>> AssignEventPosition(int registrationId, int positionId, HttpRequest request)
     {
         var registration = await _context.EventsRegistrations
@@ -304,6 +315,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<EventRegistration>> UnAssignEventPosition(int registrationId, int positionId, HttpRequest request)
     {
         var registration = await _context.EventsRegistrations
@@ -339,6 +351,7 @@ public class EventRepository : IEventRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Event>> DeleteEvent(int eventId, HttpRequest request)
     {
         var @event = await _context.Events
@@ -359,6 +372,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<EventPosition>> DeleteEventPosition(int positionId, HttpRequest request)
     {
         var position = await _context.EventsPositions.FindAsync(positionId) ??
@@ -377,6 +391,7 @@ public class EventRepository : IEventRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<EventRegistration>> DeleteEventRegistration(int eventId, HttpRequest request)
     {
         var registration = await request.HttpContext.GetUserEventRegistration(_context, eventId) ??

@@ -26,6 +26,7 @@ public class AirportRepository : IAirportRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Airport>> CreateAirport(Airport airport, HttpRequest request)
     {
         var result = await _context.AddAsync(airport);
@@ -46,6 +47,7 @@ public class AirportRepository : IAirportRepository
 
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<Airport>>> GetAirports()
     {
         var cachedAirports = await _cache.GetStringAsync("_airports");
@@ -77,6 +79,7 @@ public class AirportRepository : IAirportRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<Airport>> GetAirport(int airportId)
     {
         var result = await _context.Airports.FindAsync(airportId) ??
@@ -93,6 +96,7 @@ public class AirportRepository : IAirportRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Airport>> UpdateAirport(Airport airport, HttpRequest request)
     {
         var dbAirport = await _context.Airports.AsNoTracking().FirstOrDefaultAsync(x => x.Id == airport.Id) ??
@@ -118,6 +122,7 @@ public class AirportRepository : IAirportRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Airport>> DeleteAirport(int airportId, HttpRequest request)
     {
         var result = await _context.Airports.FindAsync(airportId) ??

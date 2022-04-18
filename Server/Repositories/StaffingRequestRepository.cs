@@ -28,6 +28,7 @@ public class StaffingRequestRepository : IStaffingRequestRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<string>> CreateStaffingRequest(StaffingRequest staffingRequest, HttpRequest request)
     {
         var result = await _context.StaffingRequests.AddAsync(staffingRequest);
@@ -52,9 +53,13 @@ public class StaffingRequestRepository : IStaffingRequestRepository
 
     #region Read
 
-    public async Task<Response<IList<StaffingRequest>>> GetStaffingRequests()
+    /// <inheritdoc />
+    public async Task<Response<IList<StaffingRequest>>> GetStaffingRequests(int skip, int take, StaffingRequestStatus status)
     {
-        var result = await _context.StaffingRequests.ToListAsync();
+        var result = await _context.StaffingRequests
+            .Skip(skip).Take(take)
+            .Where(x => x.Status == status)
+            .ToListAsync();
         return new Response<IList<StaffingRequest>>
         {
             StatusCode = HttpStatusCode.OK,
@@ -63,6 +68,7 @@ public class StaffingRequestRepository : IStaffingRequestRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<StaffingRequest>> GetStaffingRequest(int staffingRequestId)
     {
         var result = await _context.StaffingRequests.FindAsync(staffingRequestId) ??
@@ -79,6 +85,7 @@ public class StaffingRequestRepository : IStaffingRequestRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<StaffingRequest>> UpdateStaffingRequest(StaffingRequest staffingRequest, HttpRequest request)
     {
         var dbStaffingRequest = await _context.StaffingRequests.AsNoTracking().FirstOrDefaultAsync(x => x.Id == staffingRequest.Id) ??
@@ -103,6 +110,7 @@ public class StaffingRequestRepository : IStaffingRequestRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<StaffingRequest>> DeleteStaffingRequest(int staffingRequestId, HttpRequest request)
     {
         var staffingRequest = await _context.StaffingRequests.FindAsync(staffingRequestId) ??

@@ -24,6 +24,7 @@ public class PositionRepository : IPositionRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Position>> CreatePosition(Position position, HttpRequest request)
     {
         var result = await _context.Positions.AddAsync(position);
@@ -44,6 +45,7 @@ public class PositionRepository : IPositionRepository
 
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<Position>>> GetPositions()
     {
         var positions = await _context.Positions.ToListAsync();
@@ -59,6 +61,7 @@ public class PositionRepository : IPositionRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Position>> DeletePosition(int positionId, HttpRequest request)
     {
         var position = await _context.Positions.FindAsync(positionId) ??

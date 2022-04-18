@@ -31,8 +31,12 @@ public class FeedbackRepository : IFeedbackRepository
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<string>> CreateFeedback(Feedback feedback, HttpRequest request)
     {
+        if (!await _context.Users.AnyAsync(x => x.Id == feedback.UserId))
+            throw new UserNotFoundException($"User '{feedback.UserId}' not found");
+
         var result = await _context.Feedback.AddAsync(feedback);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(result.Entity);
@@ -55,9 +59,10 @@ public class FeedbackRepository : IFeedbackRepository
 
     #region Read
 
-    public async Task<Response<IList<Feedback>>> GetFeedback()
+    /// <inheritdoc />
+    public async Task<Response<IList<Feedback>>> GetFeedback(int skip, int take)
     {
-        var cachedFeedback = await _cache.GetStringAsync("_feedback");
+        var cachedFeedback = await _cache.GetStringAsync($"_feedback_{skip}_{take}");
         if (!string.IsNullOrEmpty(cachedFeedback))
         {
             var feedback = JsonConvert.DeserializeObject<List<Feedback>>(cachedFeedback);
@@ -70,13 +75,13 @@ public class FeedbackRepository : IFeedbackRepository
                 };
         }
 
-        var result = await _context.Feedback.ToListAsync();
+        var result = await _context.Feedback.Skip(skip).Take(take).ToListAsync();
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync("_feedback", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_feedback_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
 
         return new Response<IList<Feedback>>
         {
@@ -86,6 +91,7 @@ public class FeedbackRepository : IFeedbackRepository
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<Feedback>> GetFeedback(int feedbackId)
     {
         var result = await _context.Feedback
@@ -105,8 +111,12 @@ public class FeedbackRepository : IFeedbackRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Feedback>> UpdateFeedback(Feedback feedback, HttpRequest request)
     {
+        if (!await _context.Users.AnyAsync(x => x.Id == feedback.UserId))
+            throw new UserNotFoundException($"User '{feedback.UserId}' not found");
+
         var dbFeedback = await _context.Feedback.AsNoTracking().FirstOrDefaultAsync(x => x.Id == feedback.Id) ??
             throw new FeedbackNotFoundException($"Feedback '{feedback.Id}' not found");
 
@@ -129,6 +139,7 @@ public class FeedbackRepository : IFeedbackRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Feedback>> DeleteFeedback(int feedbackId, HttpRequest request)
     {
         var feedback = await _context.Feedback.FindAsync(feedbackId) ??

@@ -64,11 +64,11 @@ public class StaffingRequestsController : ControllerBase
     // todo auth
     [SwaggerResponse(200, "Got all staffing requests", typeof(Response<IList<StaffingRequest>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<StaffingRequest>>>> GetStaffingRequests()
+    public async Task<ActionResult<Response<IList<StaffingRequest>>>> GetStaffingRequests(int skip, int take, StaffingRequestStatus status)
     {
         try
         {
-            return Ok(await _staffingRequestRepository.GetStaffingRequests());
+            return Ok(await _staffingRequestRepository.GetStaffingRequests(skip, take, status));
         }
         catch (Exception ex)
         {
