@@ -44,13 +44,13 @@ jobs:
     - name: Build jobs image 
       run: docker build -t jobs -f Jobs/Dockerfile .
     - name: Tag server image
-      run: docker tag server registry.digitalocean.com/vzdc-artcc/server:latest
+      run: docker tag server registry.digitalocean.com/vzdc/server:latest
     - name: Tag jobs image
-      run: docker tag jobs registry.digitalocean.com/vzdc-artcc/jobs:latest
+      run: docker tag jobs registry.digitalocean.com/vzdc/jobs:latest
     - name: Push server image
-      run: docker push registry.digitalocean.com/vzdc-artcc/server:latest
+      run: docker push registry.digitalocean.com/vzdc/server:latest
     - name: Push jobs image
-      run: docker push registry.digitalocean.com/vzdc-artcc/jobs:latest
+      run: docker push registry.digitalocean.com/vzdc/jobs:latest
     - name: Create Server Release
       uses: getsentry/action-release@v1
       env:
