@@ -18,13 +18,16 @@ public class TrainingTicketRepository : ITrainingTicketRepository
 {
     private readonly DatabaseContext _context;
     private readonly IDistributedCache _cache;
+    private readonly IVatusaService _vatusaService;
     private readonly IMapper _mapper;
     private readonly ILoggingService _loggingService;
 
-    public TrainingTicketRepository(DatabaseContext context, IDistributedCache cache, IMapper mapper, ILoggingService loggingService)
+    public TrainingTicketRepository(DatabaseContext context, IDistributedCache cache,
+        IVatusaService vatusaService, IMapper mapper, ILoggingService loggingService)
     {
         _context = context;
         _cache = cache;
+        _vatusaService = vatusaService;
         _mapper = mapper;
         _loggingService = loggingService;
     }
@@ -44,6 +47,7 @@ public class TrainingTicketRepository : ITrainingTicketRepository
         var newData = JsonConvert.SerializeObject(result.Entity);
 
         await _loggingService.AddWebsiteLog(request, $"Created training ticket '{result.Entity.Id}'", string.Empty, newData);
+        await _vatusaService.AddTrainingTicket(result.Entity);
 
         return new Response<TrainingTicket>
         {

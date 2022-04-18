@@ -38,9 +38,10 @@ jobs.AddEventEmailsJob(TimeSpan.FromSeconds(30), 30);
 jobs.StartJobs();
 
 
-using (SentrySdk.Init(o =>
+using (SentrySdk.Init(options =>
 {
-    o.Dsn = scope.ServiceProvider.GetRequiredService<IConfiguration>().GetValue<string>("SentryDsn");
+    options.Dsn = scope.ServiceProvider.GetRequiredService<IConfiguration>().GetValue<string>("SentryDsn");
+    options.TracesSampleRate = 1.0;
 }))
 {
     await host.RunAsync();

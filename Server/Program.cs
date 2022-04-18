@@ -17,7 +17,10 @@ using File = ZDC.Shared.Models.File;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseSentry();
+builder.WebHost.UseSentry(options =>
+{
+    options.TracesSampleRate = 1.0;
+});
 
 builder.Logging.ClearProviders();
 var logger = new LoggerConfiguration()

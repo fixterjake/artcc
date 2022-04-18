@@ -51,3 +51,20 @@ jobs:
       run: docker push registry.digitalocean.com/vzdc-artcc/server:dev
     - name: Push jobs image
       run: docker push registry.digitalocean.com/vzdc-artcc/jobs:dev
+    - uses: actions/checkout@v2
+    - name: Create Server Release
+      uses: getsentry/action-release@v1
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: vzdc
+        SENTRY_PROJECT: server
+      with:
+        environment: development
+    - name: Create Jobs Release
+      uses: getsentry/action-release@v1
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: vzdc
+        SENTRY_PROJECT: jobs
+      with:
+        environment: development
