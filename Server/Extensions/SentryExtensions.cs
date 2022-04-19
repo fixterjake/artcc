@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using System.Net;
-using System;
 using ZDC.Shared.Dtos;
 
 namespace ZDC.Server.Extensions;

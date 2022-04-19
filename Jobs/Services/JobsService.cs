@@ -1,8 +1,7 @@
-﻿using Quartz.Impl;
-using Quartz;
-using ZDC.Jobs.Services.Interfaces;
+﻿using Quartz;
+using Quartz.Impl;
 using ZDC.Jobs.Jobs;
-using ZDC.Shared.Models;
+using ZDC.Jobs.Services.Interfaces;
 
 namespace ZDC.Jobs.Services;
 

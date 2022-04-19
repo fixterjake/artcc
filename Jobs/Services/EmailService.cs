@@ -1,5 +1,5 @@
-﻿using System.Net.Mail;
-using System.Net;
+﻿using System.Net;
+using System.Net.Mail;
 using ZDC.Jobs.Services.Interfaces;
 using ZDC.Shared.Models;
 using File = System.IO.File;

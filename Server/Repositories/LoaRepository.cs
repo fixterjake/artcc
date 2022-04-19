@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Serilog;
 using System.Net;
 using ZDC.Server.Data;
 using ZDC.Server.Repositories.Interfaces;

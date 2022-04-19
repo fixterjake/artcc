@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace ZDC.Server.Services.Interfaces;
+﻿namespace ZDC.Server.Services.Interfaces;
 
 public interface ILoggingService
 {

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
-using Sentry;
 using System.Net;
 using ZDC.Server.Data;
 using ZDC.Server.Extensions;

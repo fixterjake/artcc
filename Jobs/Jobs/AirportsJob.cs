@@ -1,7 +1,7 @@
 ﻿using Quartz;
-using ZDC.Jobs.Services.Interfaces;
-using ZDC.Jobs.Services;
 using Sentry;
+using ZDC.Jobs.Services;
+using ZDC.Jobs.Services.Interfaces;
 
 namespace ZDC.Jobs.Jobs;
 

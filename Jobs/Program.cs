@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Quartz;
 using Sentry;
 using Serilog;
 using ZDC.Jobs;

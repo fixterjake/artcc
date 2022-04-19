@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using RestSharp;
+﻿using RestSharp;
 using ZDC.Server.Services.Interfaces;
 using ZDC.Shared.Models;
 

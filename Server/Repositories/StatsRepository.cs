@@ -1,6 +1,4 @@
-﻿using Amazon.Runtime.Internal.Util;
-using Amazon.S3.Model;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
