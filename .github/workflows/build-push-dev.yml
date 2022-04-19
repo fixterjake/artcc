@@ -28,7 +28,7 @@ jobs:
         EmailOptions.From: ${{ secrets.EMAIL_FROM_DEV }}
         EmailOptions.Website: ${{ secrets.EMAIL_WEBSITE_DEV }}
         Sentry.Dsn: ${{ secrets.SENTRY_DSN_SERVER }}
-        Redis.Host: ${{ secrets.REDIS_HOST }}
+        Redis.Host: ${{ secrets.REDIS_HOST_DEV }}
     - name: Inject jobs secrets
       uses: microsoft/variable-substitution@v1
       with:
