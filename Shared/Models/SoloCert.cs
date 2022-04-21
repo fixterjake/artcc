@@ -10,8 +10,10 @@ public class SoloCert
     public SoloCertFacility Position { get; set; }
     public int OldCert { get; set; }
     public int Cert { get; set; }
+    public string PositionString { get; set; } = string.Empty;
     public DateTimeOffset Start { get; set; }
     public DateTimeOffset End { get; set; }
+    public SoloCertStatus Status { get; set; }
     public DateTimeOffset Timestamp { get; set; }
 
     public SoloCert()
@@ -27,4 +29,11 @@ public enum SoloCertFacility
     Dca,
     Bwi,
     Dc
+}
+
+public enum SoloCertStatus
+{
+    Active,
+    Extended,
+    Ended
 }

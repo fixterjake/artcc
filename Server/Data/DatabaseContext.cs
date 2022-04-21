@@ -13,6 +13,7 @@ public class DatabaseContext : DbContext
 #nullable disable
 
     public DbSet<Airport> Airports { get; set; }
+    public DbSet<Announcement> Announcements { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<ControllerLog> ControllerLogs { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
@@ -23,7 +24,6 @@ public class DatabaseContext : DbContext
     public DbSet<File> Files { get; set; }
     public DbSet<Hours> Hours { get; set; }
     public DbSet<Loa> Loas { get; set; }
-    public DbSet<News> News { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<OnlineController> OnlineControllers { get; set; }
     public DbSet<Ots> Ots { get; set; }

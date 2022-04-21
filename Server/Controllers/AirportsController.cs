@@ -1,12 +1,11 @@
-﻿using System.Net;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
-using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
 using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
@@ -32,7 +31,7 @@ public class AirportsController : ControllerBase
 
     [HttpPost]
     // todo auth
-    [SwaggerResponse(200, "Created airport", typeof(Response<Airport>))]
+    [SwaggerResponse(201, "Created airport", typeof(Response<Airport>))]
     [SwaggerResponse(400, "An error occurred")]
     public async Task<ActionResult<Response<Airport>>> CreateAirport([FromBody] Airport airport)
     {

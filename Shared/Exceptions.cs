@@ -70,9 +70,9 @@ public class AirportNotFoundException : Exception
     }
 }
 
-public class NewsNotFoundException : Exception
+public class AnnouncementNotFoundException : Exception
 {
-    public NewsNotFoundException(string message) : base(message)
+    public AnnouncementNotFoundException(string message) : base(message)
     {
     }
 }
@@ -133,9 +133,30 @@ public class NotificationNotFoundException : Exception
     }
 }
 
+public class PositionNotFoundException : Exception
+{
+    public PositionNotFoundException(string message) : base(message)
+    {
+    }
+}
+
+public class StaffingRequestNotFoundException : Exception
+{
+    public StaffingRequestNotFoundException(string message) : base(message)
+    {
+    }
+}
+
 public class InvalidZdcOperationException : Exception
 {
     public InvalidZdcOperationException(string message) : base(message)
+    {
+    }
+}
+
+public class SoloCertExistsException : Exception
+{
+    public SoloCertExistsException(string message) : base(message)
     {
     }
 }

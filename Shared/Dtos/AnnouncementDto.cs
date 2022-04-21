@@ -1,6 +1,6 @@
 ﻿namespace ZDC.Shared.Dtos;
 
-public class NewsDto
+public class AnnouncementDto
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;

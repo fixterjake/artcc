@@ -1,13 +1,11 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
-using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
 using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
@@ -148,13 +146,13 @@ public class EventsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all events", typeof(Response<IList<Event>>))]
+    [SwaggerResponse(200, "Got all events", typeof(ResponsePaging<IList<Event>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Event>>>> GetEvents()
+    public async Task<ActionResult<ResponsePaging<IList<Event>>>> GetEvents(int skip = 0, int take = 10)
     {
         try
         {
-            return Ok(await _eventRepository.GetEvents(Request));
+            return Ok(await _eventRepository.GetEvents(skip, take, Request));
         }
         catch (Exception ex)
         {

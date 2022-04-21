@@ -1,12 +1,11 @@
-﻿using System.Net;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
-using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
 using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
@@ -62,14 +61,14 @@ public class CommentsController : ControllerBase
 
     [HttpGet("{userId:int}")]
     // todo auth
-    [SwaggerResponse(200, "Got user comments", typeof(Response<IList<Comment>>))]
+    [SwaggerResponse(200, "Got user comments", typeof(ResponsePaging<IList<Comment>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Comment>>>> GetUserComments(int userId)
+    public async Task<ActionResult<ResponsePaging<IList<Comment>>>> GetUserComments(int userId, int skip = 0, int take = 10)
     {
         try
         {
-            return Ok(await _commentRepository.GetUserComments(userId));
+            return Ok(await _commentRepository.GetUserComments(userId, skip, take));
         }
         catch (AirportNotFoundException ex)
         {

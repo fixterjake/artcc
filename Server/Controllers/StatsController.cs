@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
-using ZDC.Server.Data;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
-using ZDC.Server.Services.Interfaces;
 using ZDC.Shared.Dtos;
 
 namespace ZDC.Server.Controllers;
@@ -25,7 +23,7 @@ public class StatsController : ControllerBase
     [HttpGet]
     [SwaggerResponse(200, "Got stats", typeof(Response<IList<StatsDto>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<IList<StatsDto>>> GetStats(int month, int year)
+    public async Task<ActionResult<IList<StatsDto>>> GetStats(int month = 0, int year = 0)
     {
         try
         {

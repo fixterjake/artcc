@@ -9,6 +9,7 @@ public class TrainingTicket
     public User? Trainer { get; set; }
     public TrainingFacility Facility { get; set; }
     public TrainingPosition Position { get; set; }
+    public TrainingLocation Location { get; set; }
     public string PositionFull => $"{Facility}_{Position}";
     public DateTimeOffset Start { get; set; }
     public DateTimeOffset End { get; set; }
@@ -39,6 +40,13 @@ public enum TrainingPosition
     TWR,
     APP,
     CTR
+}
+
+public enum TrainingLocation
+{
+    Classroom,
+    Live,
+    Sweatbox
 }
 
 public enum OtsRecommendation

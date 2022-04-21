@@ -3,7 +3,6 @@ using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
-using ZDC.Server.Services.Interfaces;
 using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
 
@@ -24,9 +23,9 @@ public class EmailLogsController : ControllerBase
 
     [HttpGet]
     // todo auth
-    [SwaggerResponse(200, "Got all email logs", typeof(Response<IList<EmailLog>>))]
+    [SwaggerResponse(200, "Got all email logs", typeof(ResponsePaging<IList<EmailLog>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<IList<EmailLog>>> GetEmailLogs(int skip = 0, int take = 100)
+    public async Task<ActionResult<ResponsePaging<IList<EmailLog>>>> GetEmailLogs(int skip = 0, int take = 10)
     {
         try
         {

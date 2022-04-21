@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Serilog;
 using System.Net;
 using ZDC.Server.Data;
 using ZDC.Server.Repositories.Interfaces;
@@ -15,15 +14,21 @@ public class LoaRepository : ILoaRepository
 {
     private readonly DatabaseContext _context;
     private readonly ILoggingService _loggingService;
+    private readonly INotificationRepository _notificationRepository;
+    private readonly IConfiguration _configuration;
 
-    public LoaRepository(DatabaseContext context, ILoggingService loggingService)
+    public LoaRepository(DatabaseContext context, ILoggingService loggingService,
+        INotificationRepository notificationRepository, IConfiguration configuration)
     {
         _context = context;
         _loggingService = loggingService;
+        _notificationRepository = notificationRepository;
+        _configuration = configuration;
     }
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Loa>> CreateLoa(Loa loa, HttpRequest request)
     {
         var result = await _context.Loas.AddAsync(loa);
@@ -31,6 +36,10 @@ public class LoaRepository : ILoaRepository
         var newData = JsonConvert.SerializeObject(result.Entity);
 
         await _loggingService.AddWebsiteLog(request, $"Created loa '{result.Entity.Id}'", string.Empty, newData);
+
+        var website = _configuration.GetSection("EmailOptions").GetValue<string>("website");
+        await _notificationRepository.AddSeniorStaffNotification("New LOA Request", $"A new LOA request has been submitted",
+            $"{website}/loas/{result.Entity.Id}");
 
         return new Response<Loa>
         {
@@ -44,19 +53,25 @@ public class LoaRepository : ILoaRepository
 
     #region Read
 
-    public async Task<Response<IList<Loa>>> GetLoas()
+    /// <inheritdoc />
+    public async Task<ResponsePaging<IList<Loa>>> GetLoas(int skip, int take)
     {
-        var loas = await _context.Loas
+        var result = await _context.Loas
+            .Skip(skip).Take(take)
             .Include(x => x.User)
             .ToListAsync();
-        return new Response<IList<Loa>>
+        var totalCount = await _context.Loas.CountAsync();
+        return new ResponsePaging<IList<Loa>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {loas.Count} loas",
-            Data = loas
+            TotalCount = totalCount,
+            ResultCount = result.Count,
+            Message = $"Got {result.Count} loas",
+            Data = result
         };
     }
 
+    /// <inheritdoc />
     public async Task<Response<Loa>> GetLoa(int loaId)
     {
         var loa = await _context.Loas
@@ -76,23 +91,25 @@ public class LoaRepository : ILoaRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Loa>> UpdateLoa(Loa loa, HttpRequest request)
     {
         var dbLoa = await _context.Loas.AsNoTracking().FirstOrDefaultAsync(x => x.Id == loa.Id) ??
             throw new LoaNotFoundException($"Loa '{loa.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbLoa);
-        _context.Loas.Update(loa);
+        loa.Updated = DateTimeOffset.UtcNow;
+        var result = _context.Loas.Update(loa);
         await _context.SaveChangesAsync();
-        var newData = JsonConvert.SerializeObject(loa);
+        var newData = JsonConvert.SerializeObject(result.Entity);
 
-        await _loggingService.AddWebsiteLog(request, $"Updated loa '{loa.Id}'", oldData, newData);
+        await _loggingService.AddWebsiteLog(request, $"Updated loa '{result.Entity.Id}'", oldData, newData);
 
         return new Response<Loa>
         {
             StatusCode = HttpStatusCode.Created,
-            Message = $"Updated loa '{loa.Id}'",
-            Data = loa
+            Message = $"Updated loa '{result.Entity.Id}'",
+            Data = result.Entity
         };
     }
 
@@ -101,6 +118,7 @@ public class LoaRepository : ILoaRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Loa>> DeleteLoa(int loaId, HttpRequest request)
     {
         var loa = await _context.Loas.FindAsync(loaId) ??

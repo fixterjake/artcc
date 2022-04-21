@@ -89,6 +89,37 @@ namespace ZDC.Server.Migrations
                     b.ToTable("Airports");
                 });
 
+            modelBuilder.Entity("ZDC.Shared.Models.Announcement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("User")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Announcements");
+                });
+
             modelBuilder.Entity("ZDC.Shared.Models.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -437,37 +468,6 @@ namespace ZDC.Server.Migrations
                     b.ToTable("Loas");
                 });
 
-            modelBuilder.Entity("ZDC.Shared.Models.News", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("Updated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("User")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("News");
-                });
-
             modelBuilder.Entity("ZDC.Shared.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -477,6 +477,10 @@ namespace ZDC.Server.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -494,8 +498,6 @@ namespace ZDC.Server.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
                 });
@@ -540,7 +542,7 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Facility")
                         .HasColumnType("integer");
 
-                    b.Property<int>("InstructorId")
+                    b.Property<int?>("InstructorId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Position")
@@ -654,8 +656,15 @@ namespace ZDC.Server.Migrations
                     b.Property<int>("Position")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PositionString")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset>("Start")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<int>("SubmitterId")
                         .HasColumnType("integer");
@@ -705,6 +714,9 @@ namespace ZDC.Server.Migrations
                     b.Property<DateTimeOffset>("Start")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
@@ -734,6 +746,9 @@ namespace ZDC.Server.Migrations
                     b.Property<string>("InternalComments")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("Location")
+                        .HasColumnType("integer");
 
                     b.Property<int>("OtsRecommendation")
                         .HasColumnType("integer");
@@ -1093,24 +1108,11 @@ namespace ZDC.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ZDC.Shared.Models.Notification", b =>
-                {
-                    b.HasOne("ZDC.Shared.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ZDC.Shared.Models.Ots", b =>
                 {
                     b.HasOne("ZDC.Shared.Models.User", "Instructor")
                         .WithMany()
-                        .HasForeignKey("InstructorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InstructorId");
 
                     b.HasOne("ZDC.Shared.Models.User", "Recommender")
                         .WithMany()

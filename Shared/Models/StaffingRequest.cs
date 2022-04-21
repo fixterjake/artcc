@@ -9,10 +9,19 @@ public class StaffingRequest
     public string Description { get; set; } = string.Empty;
     public DateTimeOffset Start { get; set; }
     public DateTimeOffset End { get; set; }
+    public StaffingRequestStatus Status { get; set; }
     public DateTimeOffset Timestamp { get; set; }
 
     public StaffingRequest()
     {
+        Status = StaffingRequestStatus.Pending;
         Timestamp = DateTimeOffset.UtcNow;
     }
+}
+
+public enum StaffingRequestStatus
+{
+    Pending,
+    Accepted,
+    Denied
 }

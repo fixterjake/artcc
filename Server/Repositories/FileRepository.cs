@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System.Net;
 using ZDC.Server.Data;
@@ -15,16 +16,19 @@ namespace ZDC.Server.Repositories;
 public class FileRepository : IFileRepository
 {
     private readonly DatabaseContext _context;
+    private readonly IDistributedCache _cache;
     private readonly ILoggingService _loggingService;
 
-    public FileRepository(DatabaseContext context, ILoggingService loggingService)
+    public FileRepository(DatabaseContext context, IDistributedCache cache, ILoggingService loggingService)
     {
         _context = context;
+        _cache = cache;
         _loggingService = loggingService;
     }
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<File>> CreateFile(File file, HttpRequest request)
     {
         var result = await _context.Files.AddAsync(file);
@@ -46,23 +50,50 @@ public class FileRepository : IFileRepository
 
     #region Read
 
+    /// <inheritdoc />
     public async Task<Response<IList<File>>> GetFiles(HttpRequest request)
     {
-        var files = await _context.Files.ToListAsync();
+        var cachedFiles = await _cache.GetStringAsync("_files");
+        if (!string.IsNullOrEmpty(cachedFiles))
+        {
+            var files = JsonConvert.DeserializeObject<List<File>>(cachedFiles);
+            if (files != null)
+            {
+                if (!await request.HttpContext.IsStaff(_context))
+                    files = files.Where(x => x.Category != FileCategory.Staff).ToList();
+                if (!await request.HttpContext.IsTrainingStaff(_context))
+                    files = files.Where(x => x.Category != FileCategory.TrainingStaff).ToList();
+                return new Response<IList<File>>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = $"Got {files.Count} files",
+                    Data = files
+                };
+            }
+        }
+
+        var result = await _context.Files.ToListAsync();
+        var expiryOptions = new DistributedCacheEntryOptions()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
+            SlidingExpiration = TimeSpan.FromMinutes(1)
+        };
+        await _cache.SetStringAsync("_files", JsonConvert.SerializeObject(result), expiryOptions);
+
         if (!await request.HttpContext.IsStaff(_context))
-            files = files.Where(x => x.Category != FileCategory.Staff).ToList();
+            result = result.Where(x => x.Category != FileCategory.Staff).ToList();
         if (!await request.HttpContext.IsTrainingStaff(_context))
-            files = files.Where(x => x.Category != FileCategory.TrainingStaff).ToList();
+            result = result.Where(x => x.Category != FileCategory.TrainingStaff).ToList();
 
         return new Response<IList<File>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {files.Count} files",
-            Data = files
+            Message = $"Got {result.Count} files",
+            Data = result
         };
     }
 
-
+    /// <inheritdoc />
     public async Task<Response<File>> GetFile(int fileId, HttpRequest request)
     {
         var file = await _context.Files.FindAsync(fileId) ??
@@ -84,12 +115,14 @@ public class FileRepository : IFileRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<File>> UpdateFile(File file, HttpRequest request)
     {
         var dbFile = await _context.Files.AsNoTracking().FirstOrDefaultAsync(x => x.Id == file.Id) ??
             throw new FileNotFoundException($"File '{file.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbFile);
+        file.Updated = DateTimeOffset.UtcNow;
         var result = _context.Files.Update(file);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(result.Entity);
@@ -108,6 +141,7 @@ public class FileRepository : IFileRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<File>> DeleteFile(int fileId, HttpRequest request)
     {
         var file = await _context.Files.FindAsync(fileId) ??

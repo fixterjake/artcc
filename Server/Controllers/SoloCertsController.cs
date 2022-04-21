@@ -5,7 +5,6 @@ using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using ZDC.Server.Extensions;
-using ZDC.Server.Repositories;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Shared;
 using ZDC.Shared.Dtos;
@@ -15,15 +14,15 @@ namespace ZDC.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class NewsController : ControllerBase
+public class SoloCertsController : ControllerBase
 {
-    private readonly INewsRepository _newsRepository;
-    private readonly IValidator<News> _validator;
+    private readonly ISoloCertRepository _soloCertRepository;
+    private readonly IValidator<SoloCert> _validator;
     private readonly IHub _sentryHub;
 
-    public NewsController(INewsRepository newsRepository, IValidator<News> validator, IHub sentryHub)
+    public SoloCertsController(ISoloCertRepository soloCertRepository, IValidator<SoloCert> validator, IHub sentryHub)
     {
-        _newsRepository = newsRepository;
+        _soloCertRepository = soloCertRepository;
         _validator = validator;
         _sentryHub = sentryHub;
     }
@@ -32,14 +31,14 @@ public class NewsController : ControllerBase
 
     [HttpPost]
     // todo auth
-    [SwaggerResponse(200, "Created news", typeof(Response<News>))]
+    [SwaggerResponse(200, "Created solo cert", typeof(Response<SoloCert>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<News>>> CreateNews([FromBody] News news)
+    public async Task<ActionResult<Response<SoloCert>>> CreateSoloCert([FromBody] SoloCert soloCert)
     {
         try
         {
-            var result = await _validator.ValidateAsync(news);
+            var result = await _validator.ValidateAsync(soloCert);
             if (!result.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
@@ -49,11 +48,20 @@ public class NewsController : ControllerBase
                     Data = result.Errors
                 });
             }
-            return Ok(await _newsRepository.CreateNews(news, Request));
+            return Ok(await _soloCertRepository.CreateSoloCert(soloCert, Request));
         }
         catch (UserNotFoundException ex)
         {
             return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
+        }
+        catch (SoloCertExistsException ex)
+        {
+            return BadRequest(new Response<string>
             {
                 StatusCode = HttpStatusCode.NotFound,
                 Message = ex.Message,
@@ -71,13 +79,14 @@ public class NewsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all news", typeof(Response<IList<News>>))]
+    // todo auth
+    [SwaggerResponse(200, "Got all solo certs", typeof(Response<SoloCert>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<News>>>> GetNews()
+    public async Task<ActionResult<Response<IList<SoloCert>>>> GetSoloCerts()
     {
         try
         {
-            return Ok(await _newsRepository.GetNews());
+            return Ok(await _soloCertRepository.GetSoloCerts());
         }
         catch (Exception ex)
         {
@@ -85,17 +94,27 @@ public class NewsController : ControllerBase
         }
     }
 
-    [HttpGet("{newsId:int}")]
-    [SwaggerResponse(200, "Got news", typeof(Response<News>))]
-    [SwaggerResponse(400, "News not found")]
+    [HttpGet("{userId:int}")]
+    // todo auth
+    [SwaggerResponse(200, "Got solo cert", typeof(Response<SoloCert>))]
+    [SwaggerResponse(404, "User or solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<News>>> GetNews(int newsId)
+    public async Task<ActionResult<Response<SoloCert>>> GetSoloCert(int userId)
     {
         try
         {
-            return Ok(await _newsRepository.GetNews(newsId));
+            return Ok(await _soloCertRepository.GetSoloCert(userId));
         }
-        catch (NewsNotFoundException ex)
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
+        }
+        catch (SoloCertNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -114,37 +133,18 @@ public class NewsController : ControllerBase
 
     #region Update
 
-    [HttpPut]
+    [HttpPut("{soloCertId:int}/{end:DateTime}")]
     // todo auth
-    [SwaggerResponse(200, "Updated news", typeof(Response<News>))]
-    [SwaggerResponse(404, "User or news not found")]
+    [SwaggerResponse(200, "Updated solo cert", typeof(Response<SoloCert>))]
+    [SwaggerResponse(404, "User or solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<News>>> UpdateNews([FromBody] News news)
+    public async Task<ActionResult<Response<SoloCert>>> ExtendSoloCert(int soloCertId, DateTimeOffset end)
     {
         try
         {
-            var result = await _validator.ValidateAsync(news);
-            if (!result.IsValid)
-            {
-                return BadRequest(new Response<IList<ValidationFailure>>
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = "Validation error",
-                    Data = result.Errors
-                });
-            }
-            return Ok(await _newsRepository.UpdateNews(news, Request));
+            return Ok(await _soloCertRepository.ExtendSoloCert(soloCertId, end, Request));
         }
-        catch (UserNotFoundException ex)
-        {
-            return NotFound(new Response<string>
-            {
-                StatusCode = HttpStatusCode.NotFound,
-                Message = ex.Message,
-                Data = string.Empty
-            });
-        }
-        catch (NewsNotFoundException ex)
+        catch (SoloCertNotFoundException ex)
         {
             return NotFound(new Response<string>
             {
@@ -163,18 +163,18 @@ public class NewsController : ControllerBase
 
     #region Delete
 
-    [HttpDelete("{newsId:int}")]
+    [HttpDelete("{soloCertId:int}")]
     // todo auth
-    [SwaggerResponse(200, "Deleted news", typeof(Response<News>))]
-    [SwaggerResponse(404, "News not found")]
+    [SwaggerResponse(200, "Deleted solo cert", typeof(Response<SoloCert>))]
+    [SwaggerResponse(404, "Solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<News>>> DeleteNews(int newsId)
+    public async Task<ActionResult<Response<SoloCert>>> DeletSoloCert(int soloCertId)
     {
         try
         {
-            return Ok(await _newsRepository.DeleteNews(newsId, Request));
+            return Ok(await _soloCertRepository.DeleteSoloCert(soloCertId, Request));
         }
-        catch (NewsNotFoundException ex)
+        catch (SoloCertNotFoundException ex)
         {
             return NotFound(new Response<string>
             {

@@ -1,13 +1,11 @@
-﻿using System.Net;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using ZDC.Server.Extensions;
-using ZDC.Server.Repositories;
 using ZDC.Server.Repositories.Interfaces;
-using ZDC.Server.Services.Interfaces;
 using ZDC.Shared;
 using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
@@ -63,13 +61,13 @@ public class LoasController : ControllerBase
 
     [HttpGet]
     // todo auth
-    [SwaggerResponse(200, "Got loas", typeof(Response<IList<Loa>>))]
+    [SwaggerResponse(200, "Got loas", typeof(ResponsePaging<IList<Loa>>))]
     [SwaggerResponse(400, "An error occurred")]
-    public async Task<ActionResult<Response<IList<Loa>>>> GetLoas()
+    public async Task<ActionResult<ResponsePaging<IList<Loa>>>> GetLoas(int skip = 0, int take = 10)
     {
         try
         {
-            return Ok(await _loaRepository.GetLoas());
+            return Ok(await _loaRepository.GetLoas(skip, take));
         }
         catch (Exception ex)
         {

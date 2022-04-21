@@ -27,6 +27,8 @@ jobs:
         EmailOptions.Password: ${{ secrets.EMAIL_PASSWORD }}
         EmailOptions.From: ${{ secrets.EMAIL_FROM_PROD }}
         EmailOptions.Website: ${{ secrets.EMAIL_WEBSITE_PROD }}
+        Sentry.Dsn: ${{ secrets.SENTRY_DSN_SERVER }}
+        Redis.Host: ${{ secrets.REDIS_HOST_PROD }}
     - name: Inject jobs secrets
       uses: microsoft/variable-substitution@v1
       with:
@@ -34,6 +36,7 @@ jobs:
       env:
         ConnectionString: ${{ secrets.CONN_STRING_PROD }}
         VatusaApiKey: ${{ secrets.VATUSA_API_KEY }}
+        SentryDsn: ${{ secrets.SENTRY_DSN_JOBS }}
     - name: Log into registry
       run: docker login -u ${{ secrets.DO_REGISTRY_TOKEN }} -p ${{ secrets.DO_REGISTRY_TOKEN }} registry.digitalocean.com
     - name: Build server image 
@@ -41,10 +44,28 @@ jobs:
     - name: Build jobs image 
       run: docker build -t jobs -f Jobs/Dockerfile .
     - name: Tag server image
-      run: docker tag server registry.digitalocean.com/vzdc-artcc/server:latest
+      run: docker tag server registry.digitalocean.com/vzdc/server:latest
     - name: Tag jobs image
-      run: docker tag jobs registry.digitalocean.com/vzdc-artcc/jobs:latest
+      run: docker tag jobs registry.digitalocean.com/vzdc/jobs:latest
     - name: Push server image
-      run: docker push registry.digitalocean.com/vzdc-artcc/server:latest
+      run: docker push registry.digitalocean.com/vzdc/server:latest
     - name: Push jobs image
-      run: docker push registry.digitalocean.com/vzdc-artcc/jobs:latest
+      run: docker push registry.digitalocean.com/vzdc/jobs:latest
+    - name: Create Server Release
+      uses: getsentry/action-release@v1
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: vzdc
+        SENTRY_PROJECT: server
+      with:
+        environment: production
+        version: ${{github.ref_name}}
+    - name: Create Jobs Release
+      uses: getsentry/action-release@v1
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: vzdc
+        SENTRY_PROJECT: jobs
+      with:
+        environment: production
+        version: ${{github.ref_name}}

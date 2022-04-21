@@ -1,6 +1,7 @@
-﻿using System.Net;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using System.Net;
 using ZDC.Server.Data;
 using ZDC.Server.Repositories.Interfaces;
 using ZDC.Server.Services.Interfaces;
@@ -13,16 +14,19 @@ namespace ZDC.Server.Repositories;
 public class CommentRepository : ICommentRepository
 {
     private readonly DatabaseContext _context;
+    private readonly IDistributedCache _cache;
     private readonly ILoggingService _loggingService;
 
-    public CommentRepository(DatabaseContext context, ILoggingService loggingService)
+    public CommentRepository(DatabaseContext context, IDistributedCache cache, ILoggingService loggingService)
     {
         _context = context;
+        _cache = cache;
         _loggingService = loggingService;
     }
 
     #region Create
 
+    /// <inheritdoc />
     public async Task<Response<Comment>> CreateComment(Comment comment, HttpRequest request)
     {
         var result = await _context.Comments.AddAsync(comment);
@@ -43,17 +47,24 @@ public class CommentRepository : ICommentRepository
 
     #region Read
 
-    public async Task<Response<IList<Comment>>> GetUserComments(int userId)
+    /// <inheritdoc />
+    public async Task<ResponsePaging<IList<Comment>>> GetUserComments(int userId, int skip, int take)
     {
         if (!_context.Users.Any(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
+        var result = await _context.Comments
+            .Where(x => x.UserId == userId)
+            .Skip(skip).Take(take)
+            .ToListAsync();
+        var totalCount = await _context.Comments.CountAsync();
 
-        var comments = await _context.Comments.Where(x => x.UserId == userId).ToListAsync();
-        return new Response<IList<Comment>>
+        return new ResponsePaging<IList<Comment>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {comments.Count} comments",
-            Data = comments
+            TotalCount = totalCount,
+            ResultCount = result.Count,
+            Message = $"Got {result.Count} comments",
+            Data = result
         };
     }
 
@@ -61,6 +72,7 @@ public class CommentRepository : ICommentRepository
 
     #region Update
 
+    /// <inheritdoc />
     public async Task<Response<Comment>> UpdateComment(Comment comment, HttpRequest request)
     {
         var dbComment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == comment.Id) ??
@@ -90,6 +102,7 @@ public class CommentRepository : ICommentRepository
 
     #region Delete
 
+    /// <inheritdoc />
     public async Task<Response<Comment>> DeleteComment(int commentId, HttpRequest request)
     {
         var comment = await _context.Comments.FindAsync(commentId) ??

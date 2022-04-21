@@ -1,6 +1,6 @@
 ﻿namespace ZDC.Shared.Models;
 
-public class News
+public class Announcement
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
@@ -9,7 +9,7 @@ public class News
     public string User { get; set; } = string.Empty;
     public DateTimeOffset Updated { get; set; }
 
-    public News()
+    public Announcement()
     {
         Updated = DateTimeOffset.UtcNow;
     }

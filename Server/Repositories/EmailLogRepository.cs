@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Net;
 using ZDC.Server.Data;
 using ZDC.Server.Repositories.Interfaces;
+using ZDC.Shared.Dtos;
 using ZDC.Shared.Models;
 
 namespace ZDC.Server.Repositories;
@@ -15,12 +17,18 @@ public class EmailLogRepository : IEmailLogRepository
         _context = context;
     }
 
-    #region Read
-
-    public async Task<IList<EmailLog>> GetEmailLogs(int skip, int take)
+    /// <inheritdoc />
+    public async Task<ResponsePaging<IList<EmailLog>>> GetEmailLogs(int skip, int take)
     {
-        return await _context.EmailLogs.Skip(skip).Take(take).ToListAsync();
+        var result = await _context.EmailLogs.Skip(skip).Take(take).ToListAsync();
+        var totalCount = await _context.EmailLogs.CountAsync();
+        return new ResponsePaging<IList<EmailLog>>
+        {
+            StatusCode = HttpStatusCode.OK,
+            TotalCount = totalCount,
+            ResultCount = result.Count,
+            Message = $"Got {result.Count} email logs",
+            Data = result
+        };
     }
-
-    #endregion
 }

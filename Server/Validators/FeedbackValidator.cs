@@ -8,8 +8,6 @@ public class FeedbackValidator : AbstractValidator<Feedback>
     public FeedbackValidator()
     {
         RuleFor(x => x.UserId).NotEmpty();
-        RuleFor(x => x.ControllerPosition).NotEmpty();
-        RuleFor(x => x.ServiceLevel).NotEmpty();
         RuleFor(x => x.Callsign).NotEmpty();
         RuleFor(x => x.Name).NotEmpty();
         RuleFor(x => x.Email).NotEmpty();
