@@ -43,5 +43,12 @@ using (SentrySdk.Init(options =>
     options.TracesSampleRate = 1.0;
 }))
 {
-    await host.RunAsync();
+    try
+    {
+        await host.RunAsync();
+    }
+    catch (InvalidOperationException ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
 }
