@@ -86,6 +86,7 @@ builder.Services.AddAutoMapper(typeof(AutomapperConfig));
 builder.Services.AddScoped<ILoggingService, LoggingService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IVatusaService, VatusaService>();
+builder.Services.AddScoped<ISpacesService, SpacesService>();
 
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
@@ -104,6 +105,7 @@ builder.Services.AddScoped<IPositionRepository, PositionRepository>();
 builder.Services.AddScoped<ISoloCertRepository, SoloCertRepository>();
 builder.Services.AddScoped<IStaffingRequestRepository, StaffingRequestRepository>();
 builder.Services.AddScoped<ITrainingTicketRepository, TrainingTicketRepository>();
+builder.Services.AddScoped<IUploadRepository, UploadRepository>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
