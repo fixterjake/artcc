@@ -18,12 +18,12 @@ var host = Host.CreateDefaultBuilder(args)
     {
         services.AddDbContext<DatabaseContext>(options =>
             options.UseNpgsql(hostContext.Configuration.GetValue<string>("ConnectionString")));
-        services.AddTransient<ILoggingService, LoggingService>();
-        services.AddTransient<IEmailService, EmailService>();
-        services.AddTransient<IDatafeedService, DatafeedService>();
-        services.AddTransient<IVatusaService, VatusaService>();
-        services.AddTransient<IJobsService, JobsService>();
-        services.AddTransient<IAvwxService, AvwxService>();
+        services.AddScoped<ILoggingService, LoggingService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IDatafeedService, DatafeedService>();
+        services.AddScoped<IVatusaService, VatusaService>();
+        services.AddScoped<IJobsService, JobsService>();
+        services.AddScoped<IAvwxService, AvwxService>();
     })
     .Build();
 

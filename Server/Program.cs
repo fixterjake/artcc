@@ -64,48 +64,48 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString")));
 
-builder.Services.AddTransient<IValidator<Airport>, AirportValidator>();
-builder.Services.AddTransient<IValidator<Announcement>, AnnouncementValidator>();
-builder.Services.AddTransient<IValidator<Comment>, CommentValidator>();
-builder.Services.AddTransient<IValidator<EventPosition>, EventPositionValidator>();
-builder.Services.AddTransient<IValidator<EventRegistration>, EventRegistrationValidator>();
-builder.Services.AddTransient<IValidator<Event>, EventValidator>();
-builder.Services.AddTransient<IValidator<Feedback>, FeedbackValidator>();
-builder.Services.AddTransient<IValidator<File>, FileValidator>();
-builder.Services.AddTransient<IValidator<Loa>, LoaValidator>();
-builder.Services.AddTransient<IValidator<Ots>, OtsValidator>();
-builder.Services.AddTransient<IValidator<Position>, PositionValidator>();
-builder.Services.AddTransient<IValidator<Settings>, SettingsValidator>();
-builder.Services.AddTransient<IValidator<SoloCert>, SoloCertValidator>();
-builder.Services.AddTransient<IValidator<StaffingRequest>, StaffingRequestValidator>();
-builder.Services.AddTransient<IValidator<TrainingTicket>, TrainingTicketValidator>();
-builder.Services.AddTransient<IValidator<VisitRequest>, VisitRequestValidator>();
+builder.Services.AddScoped<IValidator<Airport>, AirportValidator>();
+builder.Services.AddScoped<IValidator<Announcement>, AnnouncementValidator>();
+builder.Services.AddScoped<IValidator<Comment>, CommentValidator>();
+builder.Services.AddScoped<IValidator<EventPosition>, EventPositionValidator>();
+builder.Services.AddScoped<IValidator<EventRegistration>, EventRegistrationValidator>();
+builder.Services.AddScoped<IValidator<Event>, EventValidator>();
+builder.Services.AddScoped<IValidator<Feedback>, FeedbackValidator>();
+builder.Services.AddScoped<IValidator<File>, FileValidator>();
+builder.Services.AddScoped<IValidator<Loa>, LoaValidator>();
+builder.Services.AddScoped<IValidator<Ots>, OtsValidator>();
+builder.Services.AddScoped<IValidator<Position>, PositionValidator>();
+builder.Services.AddScoped<IValidator<Settings>, SettingsValidator>();
+builder.Services.AddScoped<IValidator<SoloCert>, SoloCertValidator>();
+builder.Services.AddScoped<IValidator<StaffingRequest>, StaffingRequestValidator>();
+builder.Services.AddScoped<IValidator<TrainingTicket>, TrainingTicketValidator>();
+builder.Services.AddScoped<IValidator<VisitRequest>, VisitRequestValidator>();
 
 builder.Services.AddAutoMapper(typeof(AutomapperConfig));
 
-builder.Services.AddTransient<ILoggingService, LoggingService>();
-builder.Services.AddTransient<IEmailService, EmailService>();
-builder.Services.AddTransient<IVatusaService, VatusaService>();
+builder.Services.AddScoped<ILoggingService, LoggingService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IVatusaService, VatusaService>();
 
-builder.Services.AddTransient<IAirportRepository, AirportRepository>();
-builder.Services.AddTransient<IAnnouncementRepository, AnnouncementRepository>();
-builder.Services.AddTransient<ICommentRepository, CommentRepository>();
-builder.Services.AddTransient<IControllerLogRepository, ControllerLogRepository>();
-builder.Services.AddTransient<IEmailLogRepository, EmailLogRepository>();
-builder.Services.AddTransient<IEventRepository, EventRepository>();
-builder.Services.AddTransient<IFeedbackRepository, FeedbackRepository>();
-builder.Services.AddTransient<IFileRepository, FileRepository>();
-builder.Services.AddTransient<IStatsRepository, StatsRepository>();
-builder.Services.AddTransient<ILoaRepository, LoaRepository>();
-builder.Services.AddTransient<INotificationRepository, NotificationRepository>();
-builder.Services.AddTransient<IOnlineControllerRepository, OnlineControllerRepository>();
-builder.Services.AddTransient<IOtsRepository, OtsRepository>();
-builder.Services.AddTransient<IPositionRepository, PositionRepository>();
-builder.Services.AddTransient<ISoloCertRepository, SoloCertRepository>();
-builder.Services.AddTransient<IStaffingRequestRepository, StaffingRequestRepository>();
-builder.Services.AddTransient<ITrainingTicketRepository, TrainingTicketRepository>();
+builder.Services.AddScoped<IAirportRepository, AirportRepository>();
+builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IControllerLogRepository, ControllerLogRepository>();
+builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+builder.Services.AddScoped<IFileRepository, FileRepository>();
+builder.Services.AddScoped<IStatsRepository, StatsRepository>();
+builder.Services.AddScoped<ILoaRepository, LoaRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IOnlineControllerRepository, OnlineControllerRepository>();
+builder.Services.AddScoped<IOtsRepository, OtsRepository>();
+builder.Services.AddScoped<IPositionRepository, PositionRepository>();
+builder.Services.AddScoped<ISoloCertRepository, SoloCertRepository>();
+builder.Services.AddScoped<IStaffingRequestRepository, StaffingRequestRepository>();
+builder.Services.AddScoped<ITrainingTicketRepository, TrainingTicketRepository>();
 
-builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddSystemMetrics();
 
