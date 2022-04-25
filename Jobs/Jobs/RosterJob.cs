@@ -33,7 +33,14 @@ public class RosterJob : IJob
         _logger.LogInformation("Running roster job...");
 
         var start = DateTimeOffset.UtcNow;
-        await UpdateRoster();
+        try
+        {
+            await UpdateRoster();
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
         var end = DateTimeOffset.UtcNow;
 
         _logger.LogInformation("Roster job finished -- Took {time} seconds", Math.Round((end - start).TotalSeconds, 2));

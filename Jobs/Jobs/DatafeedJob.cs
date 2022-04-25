@@ -30,7 +30,14 @@ public class DatafeedJob : IJob
         _logger.LogInformation("Running datafeed job...");
 
         var start = DateTimeOffset.UtcNow;
-        await UpdateControllerLogs();
+        try
+        {
+            await UpdateControllerLogs();
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
         var end = DateTimeOffset.UtcNow;
 
         _logger.LogInformation("Datafeed job finished -- Took {time} seconds", Math.Round((end - start).TotalSeconds, 2));

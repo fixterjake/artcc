@@ -38,15 +38,7 @@ public class DatafeedService : IDatafeedService
     public async Task<IList<Controller>> GetZdcControllers(Datafeed datafeed)
     {
         var result = new List<Controller>();
-        var positions = new List<string>();
-        try
-        {
-            positions = await _context.Positions.Select(x => x.Name).ToListAsync();
-        }
-        catch (InvalidOperationException ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+        var positions = await _context.Positions.Select(x => x.Name).ToListAsync();
 
         if (positions == null || datafeed == null || datafeed.Controllers == null)
             return result;

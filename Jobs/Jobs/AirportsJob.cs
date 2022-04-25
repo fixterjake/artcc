@@ -30,7 +30,14 @@ public class AirportsJob : IJob
         _logger.LogInformation("Running airports job...");
 
         var start = DateTimeOffset.UtcNow;
-        await UpdateAirports();
+        try
+        {
+            await UpdateAirports();
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
         var end = DateTimeOffset.UtcNow;
 
         _logger.LogInformation("Airports job finished -- Took {time} seconds", Math.Round((end - start).TotalSeconds, 2));

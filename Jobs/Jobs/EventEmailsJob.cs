@@ -30,7 +30,14 @@ public class EventEmailsJob : IJob
         _logger.LogInformation("Running event emails job...");
 
         var start = DateTimeOffset.UtcNow;
-        await SendEventEmails();
+        try
+        {
+            await SendEventEmails();
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
         var end = DateTimeOffset.UtcNow;
 
         _logger.LogInformation("Event emails job finished -- Took {time} seconds", Math.Round((end - start).TotalSeconds, 2));
