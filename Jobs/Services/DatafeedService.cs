@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using ZDC.Jobs.Models;
 using ZDC.Jobs.Services.Interfaces;
+using ZDC.Shared.Models;
 
 namespace ZDC.Jobs.Services;
 
@@ -37,7 +38,15 @@ public class DatafeedService : IDatafeedService
     public async Task<IList<Controller>> GetZdcControllers(Datafeed datafeed)
     {
         var result = new List<Controller>();
-        var positions = await _context.Positions.Select(x => x.Name).ToListAsync();
+        var positions = new List<string>();
+        try
+        {
+            positions = await _context.Positions.Select(x => x.Name).ToListAsync();
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
 
         if (positions == null || datafeed == null || datafeed.Controllers == null)
             return result;
