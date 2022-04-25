@@ -18,12 +18,20 @@ public class DatafeedService : IDatafeedService
 
     public async Task<Datafeed?> GetDatafeed()
     {
-        using var client = new HttpClient();
+        try
+        {
+            using var client = new HttpClient();
 
-        var status = await client.GetFromJsonAsync<Status>(_configuration.GetValue<string>("StatusUrl"));
-        var url = status?.Data?.V3?.FirstOrDefault() ?? string.Empty;
+            var status = await client.GetFromJsonAsync<Status>(_configuration.GetValue<string>("StatusUrl"));
+            var url = status?.Data?.V3?.FirstOrDefault() ?? string.Empty;
 
-        return await client.GetFromJsonAsync<Datafeed>(url);
+            return await client.GetFromJsonAsync<Datafeed>(url);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return null;
+        }
     }
 
     public async Task<IList<Controller>> GetZdcControllers(Datafeed datafeed)
