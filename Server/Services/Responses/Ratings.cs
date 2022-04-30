@@ -14,10 +14,10 @@ public class Ratings
     public int PilotRating { get; set; }
 
     [JsonPropertyName("susp_date")]
-    public string SuspendedDate { get; set; }
+    public string SuspendedDate { get; set; } = string.Empty;
 
     [JsonPropertyName("reg_date")]
-    public string RegistrationDate { get; set; }
+    public string RegistrationDate { get; set; } = string.Empty;
 
     [JsonPropertyName("region")]
     public string Region { get; set; } = string.Empty;
