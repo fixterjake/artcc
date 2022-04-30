@@ -20,15 +20,15 @@ public class EmailLogRepository : IEmailLogRepository
     /// <inheritdoc />
     public async Task<ResponsePaging<IList<EmailLog>>> GetEmailLogs(int skip, int take)
     {
-        var result = await _context.EmailLogs.Skip(skip).Take(take).ToListAsync();
+        var emailLogs = await _context.EmailLogs.Skip(skip).Take(take).ToListAsync();
         var totalCount = await _context.EmailLogs.CountAsync();
         return new ResponsePaging<IList<EmailLog>>
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} email logs",
-            Data = result
+            ResultCount = emailLogs.Count,
+            Message = $"Got {emailLogs.Count} email logs",
+            Data = emailLogs
         };
     }
 }

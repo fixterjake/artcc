@@ -61,7 +61,7 @@ public class TrainingTicketsController : ControllerBase
 
     [HttpGet]
     // todo auth
-    [SwaggerResponse(200, "Got training tickets", typeof(Response<IList<TrainingTicket>>))]
+    [SwaggerResponse(200, "Got training tickets", typeof(ResponsePaging<IList<TrainingTicket>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
     public async Task<ActionResult<IList<TrainingTicket>>> GetTrainingTickets(int skip = 0, int take = 10)

@@ -63,7 +63,7 @@ public class TrainingTicketRepository : ITrainingTicketRepository
     /// <inheritdoc />
     public async Task<ResponsePaging<IList<TrainingTicket>>> GetTrainingTickets(int skip, int take)
     {
-        var result = await _context.TrainingTickets
+        var trainingTickets = await _context.TrainingTickets
             .Skip(skip).Take(take)
             .ToListAsync();
         var totalCount = await _context.TrainingTickets.CountAsync();
@@ -72,9 +72,9 @@ public class TrainingTicketRepository : ITrainingTicketRepository
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} training tickets",
-            Data = result
+            ResultCount = trainingTickets.Count,
+            Message = $"Got {trainingTickets.Count} training tickets",
+            Data = trainingTickets
         };
     }
 
@@ -84,7 +84,7 @@ public class TrainingTicketRepository : ITrainingTicketRepository
         if (!await _context.Users.AnyAsync(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
 
-        var result = await _context.TrainingTickets
+        var trainingTicket = await _context.TrainingTickets
             .Where(x => x.UserId == userId)
             .Skip(skip).Take(take)
             .ToListAsync();
@@ -96,9 +96,9 @@ public class TrainingTicketRepository : ITrainingTicketRepository
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} training tickets",
-            Data = result
+            ResultCount = trainingTicket.Count,
+            Message = $"Got {trainingTicket.Count} training tickets",
+            Data = trainingTicket
         };
     }
 
@@ -126,7 +126,7 @@ public class TrainingTicketRepository : ITrainingTicketRepository
                 };
         }
 
-        var result = await _context.TrainingTickets
+        var dbTrainingTickets = await _context.TrainingTickets
             .Where(x => x.UserId == user.Id)
             .Skip(skip).Take(take)
             .ToListAsync();
@@ -139,23 +139,23 @@ public class TrainingTicketRepository : ITrainingTicketRepository
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync($"_trainingtickets_{user.Id}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_trainingtickets_{user.Id}", JsonConvert.SerializeObject(dbTrainingTickets), expiryOptions);
         await _cache.SetStringAsync($"_trainingtickets_{user.Id}_count", $"{totalCount}", expiryOptions);
 
         return new ResponsePaging<IList<TrainingTicketDto>>
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} training tickets",
-            Data = _mapper.Map<IList<TrainingTicket>, IList<TrainingTicketDto>>(result)
+            ResultCount = dbTrainingTickets.Count,
+            Message = $"Got {dbTrainingTickets.Count} training tickets",
+            Data = _mapper.Map<IList<TrainingTicket>, IList<TrainingTicketDto>>(dbTrainingTickets)
         };
     }
 
     /// <inheritdoc />
     public async Task<Response<TrainingTicket>> GetTrainingTicket(int trainingTicketId)
     {
-        var ticket = await _context.TrainingTickets
+        var trainingTicket = await _context.TrainingTickets
             .Include(x => x.User)
             .Include(x => x.Trainer)
             .FirstOrDefaultAsync(x => x.Id != trainingTicketId) ??
@@ -165,7 +165,7 @@ public class TrainingTicketRepository : ITrainingTicketRepository
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Got training ticket '{trainingTicketId}'",
-            Data = ticket
+            Data = trainingTicket
         };
     }
 
@@ -180,6 +180,7 @@ public class TrainingTicketRepository : ITrainingTicketRepository
             throw new TrainingTicketNotFoundException($"Training ticket '{trainingTicket.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbTrainingTicket);
+        trainingTicket.Updated = DateTimeOffset.UtcNow;
         var result = _context.TrainingTickets.Update(trainingTicket);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(result.Entity);

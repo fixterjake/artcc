@@ -49,16 +49,16 @@ public class EventRepository : IEventRepository
     /// <inheritdoc />
     public async Task<Response<EventPosition>> CreateEventPosition(EventPosition position, int eventId, HttpRequest request)
     {
-        var @event = await _context.Events
+        var result = await _context.Events
             .Include(x => x.Positions)
             .FirstOrDefaultAsync(x => x.Id == eventId);
-        if (@event == null)
+        if (result == null)
             throw new EventNotFoundException($"Event '{eventId}' not found");
 
-        var oldData = JsonConvert.SerializeObject(@event);
-        @event.Positions?.Add(position);
+        var oldData = JsonConvert.SerializeObject(result);
+        result.Positions?.Add(position);
         await _context.SaveChangesAsync();
-        var newData = JsonConvert.SerializeObject(@event);
+        var newData = JsonConvert.SerializeObject(result);
 
         await _loggingService.AddWebsiteLog(request, $"Added event position to event '{eventId}'", oldData, newData);
 
@@ -131,7 +131,7 @@ public class EventRepository : IEventRepository
             }
         }
 
-        var result = await _context.Events
+        var dbEvents = await _context.Events
             .Skip(skip).Take(take)
             .Include(x => x.Upload)
             .Include(x => x.Positions)
@@ -143,14 +143,14 @@ public class EventRepository : IEventRepository
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync($"_events_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_events_{skip}_{take}", JsonConvert.SerializeObject(dbEvents), expiryOptions);
         await _cache.SetStringAsync($"_events_count", $"{totalCount}", expiryOptions);
 
         if (!await request.HttpContext.IsStaff(_context))
-            foreach (var entry in result)
+            foreach (var entry in dbEvents)
                 if (!entry.Open)
                 {
-                    result.Remove(entry);
+                    dbEvents.Remove(entry);
                     totalCount--;
                 }
 
@@ -158,28 +158,28 @@ public class EventRepository : IEventRepository
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} events",
-            Data = result
+            ResultCount = dbEvents.Count,
+            Message = $"Got {dbEvents.Count} events",
+            Data = dbEvents
         };
     }
 
     /// <inheritdoc />
     public async Task<Response<Event>> GetEvent(int eventId, HttpRequest request)
     {
-        var result = await _context.Events
+        var @event = await _context.Events
             .Include(x => x.Upload)
             .Include(x => x.Positions)
             .FirstOrDefaultAsync(x => x.Id == eventId) ??
             throw new EventNotFoundException($"Event '{eventId}' not found");
-        if (!await request.HttpContext.IsStaff(_context) && !result.Open)
+        if (!await request.HttpContext.IsStaff(_context) && !@event.Open)
             throw new EventNotFoundException($"Event '{eventId}' not found");
 
         return new Response<Event>
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Got event '{eventId}'",
-            Data = result
+            Data = @event
         };
     }
 
@@ -191,28 +191,28 @@ public class EventRepository : IEventRepository
             .Include(x => x.Positions)
             .FirstOrDefaultAsync(x => x.Id == eventId) ??
             throw new EventNotFoundException($"Event '{eventId}' not found");
-        var result = await _context.EventsRegistrations
+        var eventRegistration = await _context.EventsRegistrations
             .Where(x => x.EventId == @event.Id)
             .ToListAsync();
 
         return new Response<IList<EventRegistration>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {result.Count} event registrations",
-            Data = result
+            Message = $"Got {eventRegistration.Count} event registrations",
+            Data = eventRegistration
         };
     }
 
     /// <inheritdoc />
     public async Task<Response<EventRegistration>> GetUserEventRegistration(int eventId, HttpRequest request)
     {
-        var registration = await request.HttpContext.GetUserEventRegistration(_context, eventId) ??
+        var eventRegistration = await request.HttpContext.GetUserEventRegistration(_context, eventId) ??
             throw new EventRegistrationNotFoundException($"Event registration not found");
         return new Response<EventRegistration>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got event registration '{registration.Id}'",
-            Data = registration
+            Message = $"Got event registration '{eventRegistration.Id}'",
+            Data = eventRegistration
         };
     }
 
@@ -377,7 +377,7 @@ public class EventRepository : IEventRepository
             throw new EventNotFoundException($"Event '{eventId}' not found");
 
         var oldData = JsonConvert.SerializeObject(@event);
-        var result = _context.Events.Remove(@event);
+        _context.Events.Remove(@event);
         await _context.SaveChangesAsync();
 
         await _loggingService.AddWebsiteLog(request, $"Deleted event '{eventId}'", oldData, string.Empty);
@@ -385,7 +385,7 @@ public class EventRepository : IEventRepository
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Event '{eventId}' deleted",
-            Data = result.Entity
+            Data = @event
         };
     }
 
@@ -396,7 +396,7 @@ public class EventRepository : IEventRepository
             throw new EventPositionNotFoundException($"Event position '{positionId}' not found");
 
         var oldData = JsonConvert.SerializeObject(position);
-        var result = _context.EventsPositions.Remove(position);
+        _context.EventsPositions.Remove(position);
         await _context.SaveChangesAsync();
 
         await _loggingService.AddWebsiteLog(request, $"Deleted event position '{positionId}'", oldData, string.Empty);
@@ -404,7 +404,7 @@ public class EventRepository : IEventRepository
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Event position '{positionId}' deleted",
-            Data = result.Entity
+            Data = position
         };
     }
 
@@ -415,7 +415,7 @@ public class EventRepository : IEventRepository
             throw new EventRegistrationNotFoundException($"Event registration not found");
 
         var oldData = JsonConvert.SerializeObject(registration);
-        var result = _context.EventsRegistrations.Remove(registration);
+        _context.EventsRegistrations.Remove(registration);
         await _context.SaveChangesAsync();
 
         await _loggingService.AddWebsiteLog(request, $"Deleted event registration '{registration.Id}'", oldData, string.Empty);
@@ -423,7 +423,7 @@ public class EventRepository : IEventRepository
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Event registration '{registration.Id}' deleted",
-            Data = result.Entity
+            Data = registration
         };
     }
 

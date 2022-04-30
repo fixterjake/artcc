@@ -72,24 +72,24 @@ public class FileRepository : IFileRepository
             }
         }
 
-        var result = await _context.Files.ToListAsync();
+        var dbFiles = await _context.Files.ToListAsync();
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync("_files", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync("_files", JsonConvert.SerializeObject(dbFiles), expiryOptions);
 
         if (!await request.HttpContext.IsStaff(_context))
-            result = result.Where(x => x.Category != FileCategory.Staff).ToList();
+            dbFiles = dbFiles.Where(x => x.Category != FileCategory.Staff).ToList();
         if (!await request.HttpContext.IsTrainingStaff(_context))
-            result = result.Where(x => x.Category != FileCategory.TrainingStaff).ToList();
+            dbFiles = dbFiles.Where(x => x.Category != FileCategory.TrainingStaff).ToList();
 
         return new Response<IList<File>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {result.Count} files",
-            Data = result
+            Message = $"Got {dbFiles.Count} files",
+            Data = dbFiles
         };
     }
 
@@ -148,16 +148,16 @@ public class FileRepository : IFileRepository
             throw new FileNotFoundException($"File '{fileId}' not found");
 
         var oldData = JsonConvert.SerializeObject(file);
-        var result = _context.Files.Remove(file);
+        _context.Files.Remove(file);
         await _context.SaveChangesAsync();
 
-        await _loggingService.AddWebsiteLog(request, $"Deleted file '{result.Entity.Id}'", oldData, string.Empty);
+        await _loggingService.AddWebsiteLog(request, $"Deleted file '{file.Id}'", oldData, string.Empty);
 
         return new Response<File>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Deleted file '{result.Entity.Id}'",
-            Data = result.Entity
+            Message = $"Deleted file '{file.Id}'",
+            Data = file
         };
     }
 

@@ -56,7 +56,7 @@ public class LoaRepository : ILoaRepository
     /// <inheritdoc />
     public async Task<ResponsePaging<IList<Loa>>> GetLoas(int skip, int take)
     {
-        var result = await _context.Loas
+        var loas = await _context.Loas
             .Skip(skip).Take(take)
             .Include(x => x.User)
             .ToListAsync();
@@ -65,9 +65,9 @@ public class LoaRepository : ILoaRepository
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} loas",
-            Data = result
+            ResultCount = loas.Count,
+            Message = $"Got {loas.Count} loas",
+            Data = loas
         };
     }
 

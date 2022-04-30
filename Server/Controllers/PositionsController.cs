@@ -27,7 +27,7 @@ public class PositionsController : ControllerBase
 
     [HttpPost]
     // todo auth
-    [SwaggerResponse(200, "Created position", typeof(Response<Position>))]
+    [SwaggerResponse(201, "Created position", typeof(Response<Position>))]
     [SwaggerResponse(400, "An error occurred")]
     public async Task<ActionResult<Response<Position>>> CreatePosition([FromBody] Position position)
     {

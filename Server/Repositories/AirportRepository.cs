@@ -63,32 +63,32 @@ public class AirportRepository : IAirportRepository
                 };
         }
 
-        var result = await _context.Airports.ToListAsync();
+        var dbAirports = await _context.Airports.ToListAsync();
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync("_airports", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync("_airports", JsonConvert.SerializeObject(dbAirports), expiryOptions);
 
         return new Response<IList<Airport>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {result.Count} airports",
-            Data = result
+            Message = $"Got {dbAirports.Count} airports",
+            Data = dbAirports
         };
     }
 
     /// <inheritdoc />
     public async Task<Response<Airport>> GetAirport(int airportId)
     {
-        var result = await _context.Airports.FindAsync(airportId) ??
+        var airport = await _context.Airports.FindAsync(airportId) ??
             throw new AirportNotFoundException($"Airport '{airportId}' not found");
         return new Response<Airport>
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Got airport '{airportId}'",
-            Data = result
+            Data = airport
         };
     }
 
@@ -125,11 +125,11 @@ public class AirportRepository : IAirportRepository
     /// <inheritdoc />
     public async Task<Response<Airport>> DeleteAirport(int airportId, HttpRequest request)
     {
-        var result = await _context.Airports.FindAsync(airportId) ??
+        var airport = await _context.Airports.FindAsync(airportId) ??
             throw new AirportNotFoundException($"Airport '{airportId}' not found");
 
-        var oldData = JsonConvert.SerializeObject(result);
-        _context.Airports.Remove(result);
+        var oldData = JsonConvert.SerializeObject(airport);
+        _context.Airports.Remove(airport);
 
         await _loggingService.AddWebsiteLog(request, $"Deleted airport '{airportId}'", oldData, string.Empty);
 
@@ -137,7 +137,7 @@ public class AirportRepository : IAirportRepository
         {
             StatusCode = HttpStatusCode.Created,
             Message = $"Deleted airport '{airportId}'",
-            Data = result
+            Data = airport
         };
     }
 

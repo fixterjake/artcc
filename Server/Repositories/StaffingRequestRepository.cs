@@ -56,7 +56,7 @@ public class StaffingRequestRepository : IStaffingRequestRepository
     /// <inheritdoc />
     public async Task<ResponsePaging<IList<StaffingRequest>>> GetStaffingRequests(int skip, int take, StaffingRequestStatus status)
     {
-        var result = await _context.StaffingRequests
+        var staffingRequests = await _context.StaffingRequests
             .Where(x => x.Status == status)
             .Skip(skip).Take(take)
             .ToListAsync();
@@ -68,22 +68,22 @@ public class StaffingRequestRepository : IStaffingRequestRepository
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} staffing requests",
-            Data = result
+            ResultCount = staffingRequests.Count,
+            Message = $"Got {staffingRequests.Count} staffing requests",
+            Data = staffingRequests
         };
     }
 
     /// <inheritdoc />
     public async Task<Response<StaffingRequest>> GetStaffingRequest(int staffingRequestId)
     {
-        var result = await _context.StaffingRequests.FindAsync(staffingRequestId) ??
+        var staffingRequest = await _context.StaffingRequests.FindAsync(staffingRequestId) ??
             throw new StaffingRequestNotFoundException($"Staffing request '{staffingRequestId}' not found");
         return new Response<StaffingRequest>
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Got staffing request '{staffingRequestId}'",
-            Data = result
+            Data = staffingRequest
         };
     }
 

@@ -101,7 +101,6 @@ public class SoloCertRepository : ISoloCertRepository
     {
         var user = await _context.Users.FindAsync(userId) ??
             throw new UserNotFoundException("User not found");
-
         var cert = await _context.SoloCerts.FirstOrDefaultAsync(x => x.UserId == user.Id) ??
             throw new SoloCertNotFoundException("Solo cert not found");
 

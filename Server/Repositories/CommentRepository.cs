@@ -52,7 +52,7 @@ public class CommentRepository : ICommentRepository
     {
         if (!_context.Users.Any(x => x.Id == userId))
             throw new UserNotFoundException($"User '{userId}' not found");
-        var result = await _context.Comments
+        var comments = await _context.Comments
             .Where(x => x.UserId == userId)
             .Skip(skip).Take(take)
             .ToListAsync();
@@ -62,9 +62,9 @@ public class CommentRepository : ICommentRepository
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} comments",
-            Data = result
+            ResultCount = comments.Count,
+            Message = $"Got {comments.Count} comments",
+            Data = comments
         };
     }
 

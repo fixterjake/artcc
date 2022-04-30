@@ -23,7 +23,7 @@ public class VatusaService : IVatusaService
             new KeyValuePair<string, string>("expDate", soloCert.End.ToString("yyyy-MM-dd"))
         });
         await client.PostAsync(
-            $"{_configuration.GetValue<string>("VatusaUrl")}/solo?apikey={_configuration.GetValue<string>("VatusaApiKey")}",
+            $"{_configuration.GetValue<string>("VatusaApiUrl")}/solo?apikey={_configuration.GetValue<string>("VatusaApiKey")}",
             formContent
         );
     }
@@ -31,7 +31,7 @@ public class VatusaService : IVatusaService
     public async Task DeleteSoloCert(SoloCert soloCert)
     {
         using var client = new RestClient(
-                $"{_configuration.GetValue<string>("VatusaUrl")}/solo?apikey={_configuration.GetValue<string>("VatusaApiKey")}"
+                $"{_configuration.GetValue<string>("VatusaApiUrl")}/solo?apikey={_configuration.GetValue<string>("VatusaApiKey")}"
             );
         var formContent = new FormUrlEncodedContent(new[]
         {
@@ -59,7 +59,7 @@ public class VatusaService : IVatusaService
             new KeyValuePair<string, string>("location", trainingTicket.Location.ToString()),
         });
         var response = await client.PostAsync(
-            $"{_configuration.GetValue<string>("VatusaUrl")}/user/{trainingTicket.UserId}/training/record?apikey={_configuration.GetValue<string>("VatusaApiKey")}",
+            $"{_configuration.GetValue<string>("VatusaApiUrl")}/user/{trainingTicket.UserId}/training/record?apikey={_configuration.GetValue<string>("VatusaApiKey")}",
             formContent
         );
         Console.WriteLine(response);

@@ -47,7 +47,7 @@ public class ControllerLogRepository : IControllerLogRepository
                 };
         }
 
-        var result = await _context.ControllerLogs
+        var dbControllerLogs = await _context.ControllerLogs
             .Where(x => x.UserId == userId)
             .Skip(skip).Take(take)
             .ToListAsync();
@@ -58,16 +58,16 @@ public class ControllerLogRepository : IControllerLogRepository
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync($"_controllerlogs_{userId}_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_controllerlogs_{userId}_{skip}_{take}", JsonConvert.SerializeObject(dbControllerLogs), expiryOptions);
         await _cache.SetStringAsync($"_controllerlogs_{userId}_count", $"{totalCount}", expiryOptions);
 
         return new ResponsePaging<IList<ControllerLogDto>>
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} controller logs for user '{userId}'",
-            Data = _mapper.Map<IList<ControllerLog>, IList<ControllerLogDto>>(result)
+            ResultCount = dbControllerLogs.Count,
+            Message = $"Got {dbControllerLogs.Count} controller logs for user '{userId}'",
+            Data = _mapper.Map<IList<ControllerLog>, IList<ControllerLogDto>>(dbControllerLogs)
         };
     }
 }

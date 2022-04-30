@@ -45,20 +45,20 @@ public class UserRepository : IUserRepository
                 };
         }
 
-        var resultRaw = await _context.Users.ToListAsync();
-        var result = _mapper.Map<IList<UserDto>>(resultRaw);
+        var dbUsersRaw = await _context.Users.ToListAsync();
+        var dbUsers = _mapper.Map<IList<UserDto>>(dbUsersRaw);
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync("_users", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync("_users", JsonConvert.SerializeObject(dbUsers), expiryOptions);
 
         return new Response<IList<UserDto>>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got {result.Count} users",
-            Data = result
+            Message = $"Got {dbUsers.Count} users",
+            Data = dbUsers
         };
     }
 
@@ -100,6 +100,7 @@ public class UserRepository : IUserRepository
             throw new UserNotFoundException($"User '{user.Id}' not found");
 
         var oldData = JsonConvert.SerializeObject(dbUser);
+        user.Updated = DateTimeOffset.UtcNow;
         var result = _context.Users.Update(user);
         await _context.SaveChangesAsync();
         var newData = JsonConvert.SerializeObject(result.Entity);

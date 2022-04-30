@@ -83,7 +83,7 @@ public class AnnouncementRepository : IAnnouncementRepository
                 };
         }
 
-        var result = await _context.Announcements
+        var dbAnnouncements = await _context.Announcements
             .Skip(skip).Take(take)
             .ToListAsync();
         var totalCount = await _context.Announcements.CountAsync();
@@ -92,29 +92,29 @@ public class AnnouncementRepository : IAnnouncementRepository
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync($"_announcements_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_announcements_{skip}_{take}", JsonConvert.SerializeObject(dbAnnouncements), expiryOptions);
         await _cache.SetStringAsync("_announcements_count", $"{totalCount}", expiryOptions);
 
         return new ResponsePaging<IList<Announcement>>
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} announcements",
-            Data = result
+            ResultCount = dbAnnouncements.Count,
+            Message = $"Got {dbAnnouncements.Count} announcements",
+            Data = dbAnnouncements
         };
     }
 
     /// <inheritdoc />
     public async Task<Response<Announcement>> GetAnnouncement(int announcementId)
     {
-        var result = await _context.Announcements.FindAsync(announcementId) ??
+        var announcement = await _context.Announcements.FindAsync(announcementId) ??
             throw new AnnouncementNotFoundException($"Announcement '{announcementId}' not found");
         return new Response<Announcement>
         {
             StatusCode = HttpStatusCode.OK,
-            Message = $"Got announcement '{result.Id}'",
-            Data = result
+            Message = $"Got announcement '{announcement.Id}'",
+            Data = announcement
         };
     }
 

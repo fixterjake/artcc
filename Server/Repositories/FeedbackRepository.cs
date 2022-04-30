@@ -79,30 +79,30 @@ public class FeedbackRepository : IFeedbackRepository
                 };
         }
 
-        var result = await _context.Feedback.Skip(skip).Take(take).ToListAsync();
+        var dbFeedback = await _context.Feedback.Skip(skip).Take(take).ToListAsync();
         var totalCount = await _context.Feedback.CountAsync();
         var expiryOptions = new DistributedCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
             SlidingExpiration = TimeSpan.FromMinutes(1)
         };
-        await _cache.SetStringAsync($"_feedback_{skip}_{take}", JsonConvert.SerializeObject(result), expiryOptions);
+        await _cache.SetStringAsync($"_feedback_{skip}_{take}", JsonConvert.SerializeObject(dbFeedback), expiryOptions);
         await _cache.SetStringAsync($"_feedback_count", $"{totalCount}", expiryOptions);
 
         return new ResponsePaging<IList<Feedback>>
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} feedback",
-            Data = result
+            ResultCount = dbFeedback.Count,
+            Message = $"Got {dbFeedback.Count} feedback",
+            Data = dbFeedback
         };
     }
 
     /// <inheritdoc />
     public async Task<Response<Feedback>> GetFeedback(int feedbackId)
     {
-        var result = await _context.Feedback
+        var feedback = await _context.Feedback
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == feedbackId) ??
             throw new FeedbackNotFoundException($"Feedback '{feedbackId}' not found");
@@ -111,7 +111,7 @@ public class FeedbackRepository : IFeedbackRepository
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Got feedback '{feedbackId}'",
-            Data = result
+            Data = feedback
         };
     }
 

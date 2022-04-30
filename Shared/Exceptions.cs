@@ -84,9 +84,9 @@ public class FeedbackNotFoundException : Exception
     }
 }
 
-public class VisitorApplicationNotFoundException : Exception
+public class VisitRequestNotFoundException : Exception
 {
-    public VisitorApplicationNotFoundException(string message) : base(message)
+    public VisitRequestNotFoundException(string message) : base(message)
     {
     }
 }

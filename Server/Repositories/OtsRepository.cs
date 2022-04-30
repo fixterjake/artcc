@@ -63,7 +63,7 @@ public class OtsRepository : IOtsRepository
     /// <inheritdoc />
     public async Task<ResponsePaging<IList<Ots>>> GetOts(int skip, int take, OtsStatus status)
     {
-        var result = await _context.Ots
+        var ots = await _context.Ots
             .Where(x => x.Status == status)
             .Skip(skip).Take(take)
             .Include(x => x.User)
@@ -79,9 +79,9 @@ public class OtsRepository : IOtsRepository
         {
             StatusCode = HttpStatusCode.OK,
             TotalCount = totalCount,
-            ResultCount = result.Count,
-            Message = $"Got {result.Count} ots's",
-            Data = result
+            ResultCount = ots.Count,
+            Message = $"Got {ots.Count} ots's",
+            Data = ots
         };
     }
 
