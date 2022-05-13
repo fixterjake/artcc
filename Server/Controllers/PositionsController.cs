@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -26,9 +28,10 @@ public class PositionsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(201, "Created position", typeof(Response<Position>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Position>>> CreatePosition([FromBody] Position position)
     {
         try
@@ -46,9 +49,10 @@ public class PositionsController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Got positions", typeof(Response<IList<Position>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<IList<Position>>>> GetPositions()
     {
         try
@@ -66,9 +70,10 @@ public class PositionsController : ControllerBase
     #region Delete
 
     [HttpDelete("{positionId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Deleted position", typeof(Response<Position>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<IList<Position>>>> DeletePosition(int positionId)
     {
         try

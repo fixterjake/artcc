@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Amazon.Auth.AccessControlPolicy;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,9 +32,10 @@ public class LoasController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "IsMember")]
     [SwaggerResponse(200, "Created loa", typeof(Response<Loa>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Loa>>> CreateLoa([FromBody] Loa loa)
     {
         try
@@ -60,9 +63,10 @@ public class LoasController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Got loas", typeof(ResponsePaging<IList<Loa>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<ResponsePaging<IList<Loa>>>> GetLoas(int skip = 0, int take = 10)
     {
         try
@@ -76,10 +80,11 @@ public class LoasController : ControllerBase
     }
 
     [HttpGet("{loaId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Got loa", typeof(Response<Loa>))]
     [SwaggerResponse(404, "Loa not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Loa>>> GetLoa(int loaId)
     {
         try
@@ -106,10 +111,11 @@ public class LoasController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Updated loa", typeof(Response<Loa>))]
     [SwaggerResponse(404, "Loa not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Loa>>> UpdateLoa([FromBody] Loa loa)
     {
         try
@@ -136,10 +142,11 @@ public class LoasController : ControllerBase
     #region Delete
 
     [HttpDelete("{loaId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Deleted loa", typeof(Response<Loa>))]
     [SwaggerResponse(404, "Loa not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Loa>>> DeleteLoa(int loaId)
     {
         try

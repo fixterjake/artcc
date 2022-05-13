@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -31,9 +32,10 @@ public class VisitRequestsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize]
     [SwaggerResponse(201, "Created visit request", typeof(Response<VisitRequest>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<VisitRequest>>> CreateVisitRequest(VisitRequest visitRequest)
     {
         try
@@ -61,9 +63,10 @@ public class VisitRequestsController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Got visit requests", typeof(ResponsePaging<IList<VisitRequest>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<ResponsePaging<IList<VisitRequest>>>> GetVisitRequests(int skip = 0, int take = 20,
         VisitRequestStatus status = VisitRequestStatus.Pending)
     {
@@ -78,10 +81,11 @@ public class VisitRequestsController : ControllerBase
     }
 
     [HttpGet("{visitRequestId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Got visit requests", typeof(ResponsePaging<IList<VisitRequest>>))]
     [SwaggerResponse(404, "Visit request not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<VisitRequest>>> GetVisitRequest(int visitRequestId)
     {
         try
@@ -108,10 +112,11 @@ public class VisitRequestsController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Updated visit request", typeof(Response<VisitRequest>))]
     [SwaggerResponse(404, "Visit request not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<VisitRequest>>> UpdateVisitRequest(VisitRequest visitRequest)
     {
         try
@@ -148,10 +153,11 @@ public class VisitRequestsController : ControllerBase
     #region Delete
 
     [HttpDelete("{visitRequestId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Deleted visit request", typeof(Response<VisitRequest>))]
     [SwaggerResponse(404, "Visit request not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<VisitRequest>>> DeleteVisitRequest(int visitRequestId)
     {
         try

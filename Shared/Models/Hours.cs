@@ -4,7 +4,6 @@ public class Hours
 {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public User? User { get; set; }
     public int Month { get; set; }
     public int Year { get; set; }
     public TimeSpan LocalHours { get; set; }

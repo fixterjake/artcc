@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Amazon.Auth.AccessControlPolicy;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,9 +32,10 @@ public class FileController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "CanFiles")]
     [SwaggerResponse(200, "Created file", typeof(Response<File>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<File>>> CreateFile([FromBody] File file)
     {
         try
@@ -104,10 +107,11 @@ public class FileController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanFiles")]
     [SwaggerResponse(200, "Updated file", typeof(Response<File>))]
     [SwaggerResponse(404, "File not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<File>>> UpdateFile([FromBody] File file)
     {
         try
@@ -144,10 +148,11 @@ public class FileController : ControllerBase
     #region Delete
 
     [HttpDelete("{fileId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanFiles")]
     [SwaggerResponse(200, "Deleted file", typeof(Response<File>))]
     [SwaggerResponse(404, "File not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<File>>> DeleteFile(int fileId)
     {
         try

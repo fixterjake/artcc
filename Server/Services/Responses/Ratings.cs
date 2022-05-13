@@ -29,5 +29,5 @@ public class Ratings
     public string Subdivision { get; set; } = string.Empty;
 
     [JsonPropertyName("lastratingchange")]
-    public string LastRatingChange { get; set; }
+    public string LastRatingChange { get; set; } = string.Empty;
 }

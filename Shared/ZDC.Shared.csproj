@@ -8,6 +8,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="11.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.5" />
+		<PackageReference Include="VATSIM.Connect.AspNetCore.Shared" Version="1.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>

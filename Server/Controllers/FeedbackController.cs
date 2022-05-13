@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Amazon.Auth.AccessControlPolicy;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,10 +32,11 @@ public class FeedbackController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize]
     [SwaggerResponse(200, "Created feedback", typeof(Response<string>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<string>>> CreateFeedback([FromBody] Feedback feedback)
     {
         try
@@ -70,9 +73,10 @@ public class FeedbackController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "CanFeedback")]
     [SwaggerResponse(200, "Got all feedback", typeof(ResponsePaging<IList<Feedback>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<ResponsePaging<IList<Feedback>>>> GetFeedback(int skip = 0, int take = 10)
     {
         try
@@ -87,10 +91,11 @@ public class FeedbackController : ControllerBase
 
 
     [HttpGet("{feedbackId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanFeedback")]
     [SwaggerResponse(200, "Got feedback", typeof(Response<Feedback>))]
     [SwaggerResponse(404, "Feedback not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<IList<Feedback>>>> GetFeedback(int feedbackId)
     {
         try
@@ -117,10 +122,11 @@ public class FeedbackController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanFeedback")]
     [SwaggerResponse(200, "Updated feedback", typeof(Response<Feedback>))]
     [SwaggerResponse(404, "Feedback or user not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Feedback>>> UpdateFeedback([FromBody] Feedback feedback)
     {
         try
@@ -166,10 +172,11 @@ public class FeedbackController : ControllerBase
     #region Delete
 
     [HttpDelete("{feedbackId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanFeedback")]
     [SwaggerResponse(200, "Deleted feedback", typeof(Response<Feedback>))]
     [SwaggerResponse(404, "Feedback not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Feedback>>> DeleteFeedback(int feedbackId)
     {
         try

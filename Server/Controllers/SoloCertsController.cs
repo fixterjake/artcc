@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Amazon.Auth.AccessControlPolicy;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,10 +32,11 @@ public class SoloCertsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(200, "Created solo cert", typeof(Response<SoloCert>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<SoloCert>>> CreateSoloCert([FromBody] SoloCert soloCert)
     {
         try
@@ -79,9 +82,10 @@ public class SoloCertsController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(200, "Got all solo certs", typeof(Response<SoloCert>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<IList<SoloCert>>>> GetSoloCerts()
     {
         try
@@ -95,10 +99,11 @@ public class SoloCertsController : ControllerBase
     }
 
     [HttpGet("{userId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(200, "Got solo cert", typeof(Response<SoloCert>))]
     [SwaggerResponse(404, "User or solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<SoloCert>>> GetSoloCert(int userId)
     {
         try
@@ -134,10 +139,11 @@ public class SoloCertsController : ControllerBase
     #region Update
 
     [HttpPut("{soloCertId:int}/{end:DateTime}")]
-    // todo auth
+    [Authorize(Policy = "CanOts")]
     [SwaggerResponse(200, "Updated solo cert", typeof(Response<SoloCert>))]
     [SwaggerResponse(404, "User or solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<SoloCert>>> ExtendSoloCert(int soloCertId, DateTimeOffset end)
     {
         try
@@ -164,10 +170,11 @@ public class SoloCertsController : ControllerBase
     #region Delete
 
     [HttpDelete("{soloCertId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanOts")]
     [SwaggerResponse(200, "Deleted solo cert", typeof(Response<SoloCert>))]
     [SwaggerResponse(404, "Solo cert not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<SoloCert>>> DeletSoloCert(int soloCertId)
     {
         try

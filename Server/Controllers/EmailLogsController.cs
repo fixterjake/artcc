@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using ZDC.Server.Extensions;
@@ -22,9 +24,10 @@ public class EmailLogsController : ControllerBase
     }
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "CanWeb")]
     [SwaggerResponse(200, "Got all email logs", typeof(ResponsePaging<IList<EmailLog>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<ResponsePaging<IList<EmailLog>>>> GetEmailLogs(int skip = 0, int take = 10)
     {
         try

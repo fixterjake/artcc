@@ -147,16 +147,23 @@ public class StaffingRequestNotFoundException : Exception
     }
 }
 
-public class InvalidZdcOperationException : Exception
+public class SoloCertExistsException : Exception
 {
-    public InvalidZdcOperationException(string message) : base(message)
+    public SoloCertExistsException(string message) : base(message)
     {
     }
 }
 
-public class SoloCertExistsException : Exception
+public class WarningNotFoundException : Exception
 {
-    public SoloCertExistsException(string message) : base(message)
+    public WarningNotFoundException(string message) : base(message)
+    {
+    }
+}
+
+public class InvalidZdcOperationException : Exception
+{
+    public InvalidZdcOperationException(string message) : base(message)
     {
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using Prometheus;
 using Prometheus.SystemMetrics;
 using Serilog;
+using VATSIM.Connect.AspNetCore.Server.Extensions;
 using ZDC.Server.Data;
 using ZDC.Server.Repositories;
 using ZDC.Server.Repositories.Interfaces;
@@ -12,6 +13,7 @@ using ZDC.Server.Services;
 using ZDC.Server.Services.Interfaces;
 using ZDC.Server.Validators;
 using ZDC.Shared;
+using ZDC.Shared.Extensions;
 using ZDC.Shared.Models;
 using File = ZDC.Shared.Models.File;
 
@@ -64,6 +66,9 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionString")));
 
+builder.Services.AddVatsimConnect<AuthenticationService>(builder.Configuration.GetSection("VatsimServerOptions"));
+builder.Services.AddAuthorization(options => { options.AddWashingtonArtccPolicies(); });
+
 builder.Services.AddScoped<IValidator<Airport>, AirportValidator>();
 builder.Services.AddScoped<IValidator<Announcement>, AnnouncementValidator>();
 builder.Services.AddScoped<IValidator<Comment>, CommentValidator>();
@@ -109,6 +114,7 @@ builder.Services.AddScoped<ITrainingTicketRepository, TrainingTicketRepository>(
 builder.Services.AddScoped<IUploadRepository, UploadRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVisitRequestRepository, VisitRequestRepository>();
+builder.Services.AddScoped<IWarningRepository, WarningRepository>();
 
 builder.Services.AddSystemMetrics();
 
@@ -130,6 +136,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
@@ -149,7 +156,8 @@ app.UseMetricServer();
 app.UseHttpMetrics();
 
 app.UseRouting();
-
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();

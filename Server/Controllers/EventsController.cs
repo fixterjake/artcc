@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Amazon.Auth.AccessControlPolicy;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -35,9 +37,10 @@ public class EventsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Created event", typeof(Response<Event>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Event>>> CreateEvent([FromBody] Event @event)
     {
         try
@@ -61,10 +64,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpPost("{eventId:int}/position")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Created event position", typeof(Response<EventRegistration>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<EventPosition>>> CreateEventPosition(int eventId, [FromBody] EventPosition position)
     {
         try
@@ -97,10 +101,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpPost("registration")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Created event registration", typeof(Response<EventRegistration>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Event>>> CreateEventRegistration([FromBody] EventRegistration registration)
     {
         try
@@ -186,10 +191,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet("registrations/{eventId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Got event registrations", typeof(Response<IList<EventRegistration>>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<IList<Event>>>> GetEventRegistrations(int eventId)
     {
         try
@@ -213,10 +219,11 @@ public class EventsController : ControllerBase
 
 
     [HttpGet("registration/{eventId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsMember")]
     [SwaggerResponse(200, "Got event registration", typeof(Response<EventRegistration>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<IList<Event>>>> GetEventRegistration(int eventId)
     {
         try
@@ -243,10 +250,11 @@ public class EventsController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Updated event", typeof(Response<Event>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Event>>> UpdateEvent([FromBody] Event @event)
     {
         try
@@ -279,10 +287,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpPut("position")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Updated event position", typeof(Response<EventPosition>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Event>>> UpdateEventPosition([FromBody] EventPosition position)
     {
         try
@@ -315,10 +324,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpPut("relief/{eventId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Assigned relief positions", typeof(Response<EventPosition>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<IList<EventRegistration>>>> AssignReliefPositions(int eventId)
     {
         try
@@ -341,10 +351,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpPut("assign/{registrationId:int}/{positionId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Assigned event position", typeof(Response<EventRegistration>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<EventRegistration>>> AssignEventPosition(int registrationId, int positionId)
     {
         try
@@ -394,10 +405,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpPut("unassign/{registrationId:int}/{positionId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Unassigned event position", typeof(Response<EventRegistration>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<EventRegistration>>> UnassignEventPosition(int registrationId, int positionId)
     {
         try
@@ -451,10 +463,11 @@ public class EventsController : ControllerBase
     #region Delete
 
     [HttpDelete("{eventId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Deleted event", typeof(Response<Event>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Event>>> DeleteEvent(int eventId)
     {
         try
@@ -477,10 +490,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpDelete("position/{positionId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Deleted event position", typeof(Response<EventPosition>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Event>>> DeleteEventPosition(int positionId)
     {
         try
@@ -503,10 +517,11 @@ public class EventsController : ControllerBase
     }
 
     [HttpDelete("registration/{eventId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsMember")]
     [SwaggerResponse(200, "Deleted event registration", typeof(Response<EventRegistration>))]
     [SwaggerResponse(404, "Not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Event>>> DeleteEventRegistration(int eventId)
     {
         try

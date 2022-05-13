@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Amazon.Auth.AccessControlPolicy;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,9 +32,10 @@ public class AirportsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "CanAirports")]
     [SwaggerResponse(201, "Created airport", typeof(Response<Airport>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Airport>>> CreateAirport([FromBody] Airport airport)
     {
         try
@@ -104,10 +107,11 @@ public class AirportsController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanAirports")]
     [SwaggerResponse(200, "Updated airport", typeof(Response<Airport>))]
     [SwaggerResponse(404, "Airport not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Airport>>> UpdateAirport([FromBody] Airport airport)
     {
         try
@@ -144,10 +148,11 @@ public class AirportsController : ControllerBase
     #region Delete
 
     [HttpDelete("{airportId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanAirports")]
     [SwaggerResponse(200, "Deleted airport", typeof(Response<Airport>))]
     [SwaggerResponse(404, "Airport not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Airport>>> DeleteAirport(int airportId)
     {
         try

@@ -42,6 +42,8 @@ public class User
     public AirportCert Dca { get; set; }
     public AirportCert Bwi { get; set; }
     public CenterCert Center { get; set; }
+    public Access CanEvents { get; set; }
+    public Access CanTraining { get; set; }
     public UserStatus Status { get; set; }
     public ICollection<Role>? Roles { get; set; }
     public DateTimeOffset Updated { get; set; }
@@ -92,6 +94,12 @@ public enum CenterCert
     None,
     Solo,
     Certified
+}
+
+public enum Access
+{
+    Yes,
+    No
 }
 
 public enum UserStatus

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,9 +31,10 @@ public class CommentsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "CanComment")]
     [SwaggerResponse(200, "Created comment", typeof(Response<Comment>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Comment>>> CreateComment([FromBody] Comment comment)
     {
         try
@@ -60,10 +62,11 @@ public class CommentsController : ControllerBase
     #region Read
 
     [HttpGet("{userId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanComment")]
     [SwaggerResponse(200, "Got user comments", typeof(ResponsePaging<IList<Comment>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<ResponsePaging<IList<Comment>>>> GetUserComments(int userId, int skip = 0, int take = 10)
     {
         try
@@ -90,10 +93,11 @@ public class CommentsController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanComment")]
     [SwaggerResponse(200, "Updated comment", typeof(Response<Comment>))]
     [SwaggerResponse(404, "Comment or user not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Airport>>> UpdateComment([FromBody] Comment comment)
     {
         try
@@ -130,10 +134,11 @@ public class CommentsController : ControllerBase
     #region Delete
 
     [HttpDelete("{commentId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanComment")]
     [SwaggerResponse(200, "Deleted comment", typeof(Response<Comment>))]
     [SwaggerResponse(404, "Comment not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Comment>>> DeleteComment(int commentId)
     {
         try

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -23,12 +25,11 @@ public class UploadsController : ControllerBase
         _sentryHub = sentryHub;
     }
 
-    #region Create
-
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "IsStaff")]
     [SwaggerResponse(200, "Created upload", typeof(Response<Upload>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Upload>>> CreateUpload(string type)
     {
         try
@@ -49,6 +50,4 @@ public class UploadsController : ControllerBase
             return _sentryHub.CaptureException(ex).ReturnActionResult();
         }
     }
-
-    #endregion
 }

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -31,9 +32,10 @@ public class StaffingRequestsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize]
     [SwaggerResponse(201, "Created staffing request", typeof(Response<StaffingRequest>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<StaffingRequest>>> CreateStaffingRequest([FromBody] StaffingRequest staffingRequest)
     {
         try
@@ -61,9 +63,10 @@ public class StaffingRequestsController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Got all staffing requests", typeof(ResponsePaging<IList<StaffingRequest>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<ResponsePaging<IList<StaffingRequest>>>> GetStaffingRequests(int skip = 0, int take = 10,
         StaffingRequestStatus status = StaffingRequestStatus.Pending)
     {
@@ -78,10 +81,11 @@ public class StaffingRequestsController : ControllerBase
     }
 
     [HttpGet("{staffingRequestId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Got staffing request", typeof(Response<StaffingRequest>))]
     [SwaggerResponse(404, "Staffing request not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<StaffingRequest>>> GetStaffingRequest(int staffingRequestId)
     {
         try
@@ -108,9 +112,10 @@ public class StaffingRequestsController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Updated staffing request", typeof(Response<StaffingRequest>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<StaffingRequest>>> UpdateStaffingRequest([FromBody] StaffingRequest staffingRequest)
     {
         try
@@ -147,10 +152,11 @@ public class StaffingRequestsController : ControllerBase
     #region Delete
 
     [HttpDelete("{staffingRequestId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanEvents")]
     [SwaggerResponse(200, "Deleted staffing request", typeof(Response<StaffingRequest>))]
     [SwaggerResponse(404, "Staffing request not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<StaffingRequest>>> DeleteStaffingRequest(int staffingRequestId)
     {
         try

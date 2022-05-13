@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Amazon.Auth.AccessControlPolicy;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,9 +32,10 @@ public class TrainingTicketsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(201, "Created training ticket", typeof(Response<TrainingTicket>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<TrainingTicket>> CreateTrainingTicket([FromBody] TrainingTicket trainingTicket)
     {
         try
@@ -60,10 +63,11 @@ public class TrainingTicketsController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(200, "Got training tickets", typeof(ResponsePaging<IList<TrainingTicket>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<IList<TrainingTicket>>> GetTrainingTickets(int skip = 0, int take = 10)
     {
         try
@@ -77,9 +81,10 @@ public class TrainingTicketsController : ControllerBase
     }
 
     [HttpGet("user/{userId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(200, "Got user training tickets", typeof(Response<IList<TrainingTicket>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<IList<TrainingTicket>>> GetUserTrainingTickets(int userId, int skip = 0, int take = 10)
     {
         try
@@ -102,7 +107,7 @@ public class TrainingTicketsController : ControllerBase
     }
 
     [HttpGet("user")]
-    // todo auth
+    [Authorize(Policy = "IsMember")]
     [SwaggerResponse(200, "Got user training tickets", typeof(Response<IList<TrainingTicket>>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
@@ -128,7 +133,7 @@ public class TrainingTicketsController : ControllerBase
     }
 
     [HttpGet("{trainingTicketId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(200, "Got training ticket", typeof(Response<TrainingTicket>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
@@ -167,10 +172,11 @@ public class TrainingTicketsController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(200, "Updated training ticket", typeof(Response<TrainingTicket>))]
     [SwaggerResponse(404, "Training ticket or user not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<TrainingTicket>>> UpdateTrainingTicket([FromBody] TrainingTicket trainingTicket)
     {
         try
@@ -216,10 +222,11 @@ public class TrainingTicketsController : ControllerBase
     #region Delete
 
     [HttpDelete("{trainingTicketId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanTrainingTickets")]
     [SwaggerResponse(200, "Deleted training ticket", typeof(Response<TrainingTicket>))]
     [SwaggerResponse(404, "Training ticket not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<TrainingTicket>>> DeleteTrainingTicket(int trainingTicketId)
     {
         try

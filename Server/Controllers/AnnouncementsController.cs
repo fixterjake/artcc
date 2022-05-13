@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,10 +31,11 @@ public class AnnouncementsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
+    [Authorize(Policy = "IsFullStaff")]
     [SwaggerResponse(200, "Created announcement", typeof(Response<Announcement>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Announcement>>> CreateAnnouncement([FromBody] Announcement announcement)
     {
         try
@@ -114,10 +116,11 @@ public class AnnouncementsController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "IsFullStaff")]
     [SwaggerResponse(200, "Updated announcement", typeof(Response<Announcement>))]
     [SwaggerResponse(404, "User or announcement not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Announcement>>> UpdateAnnouncement([FromBody] Announcement announcement)
     {
         try
@@ -163,10 +166,11 @@ public class AnnouncementsController : ControllerBase
     #region Delete
 
     [HttpDelete("{AnnouncementId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsFullStaff")]
     [SwaggerResponse(200, "Deleted announcement", typeof(Response<Announcement>))]
     [SwaggerResponse(404, "News not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Announcement>>> DeleteAnnouncement(int announcementId)
     {
         try

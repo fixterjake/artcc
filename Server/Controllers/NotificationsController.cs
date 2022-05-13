@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -24,9 +25,11 @@ public class NotificationsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     [SwaggerResponse(200, "Got notifications", typeof(ResponsePaging<IList<Notification>>))]
     [SwaggerResponse(404, "Airport not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<ResponsePaging<IList<Notification>>>> GetNotifications(int skip = 0, int take = 10)
     {
         try

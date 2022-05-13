@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -27,8 +29,10 @@ public class UsersController : ControllerBase
     #region Read
 
     [HttpGet]
+    [Authorize]
     [SwaggerResponse(200, "Got all users", typeof(Response<IList<UserDto>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<IList<UserDto>>>> GetUsers()
     {
         try
@@ -42,9 +46,11 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{userId:int}")]
+    [Authorize]
     [SwaggerResponse(200, "Got user", typeof(Response<User>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<User>>> GetUser(int userId)
     {
         try
@@ -67,7 +73,6 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("roles")]
-    // todo auth
     [SwaggerResponse(200, "Got all roles", typeof(Response<IList<Role>>))]
     [SwaggerResponse(400, "An error occurred")]
     public async Task<ActionResult<Response<IList<Role>>>> GetRoles()
@@ -87,10 +92,11 @@ public class UsersController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanRoster")]
     [SwaggerResponse(200, "Updated user", typeof(Response<User>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<User>>> UpdateUser([FromBody] User user)
     {
         try
@@ -113,10 +119,11 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("role/{userId:int}/{roleId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Added role", typeof(Response<User>))]
     [SwaggerResponse(404, "User or role not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<User>>> AddRole(int userId, int roleId)
     {
         try
@@ -139,7 +146,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("role{userId:int}/{roleId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Removed role", typeof(Response<User>))]
     [SwaggerResponse(404, "User or role not found")]
     [SwaggerResponse(400, "An error occurred")]
@@ -169,7 +176,7 @@ public class UsersController : ControllerBase
     #region Delete
 
     [HttpDelete("{userId:int}")]
-    // todo auth
+    [Authorize(Policy = "IsSeniorStaff")]
     [SwaggerResponse(200, "Removed user", typeof(Response<User>))]
     [SwaggerResponse(404, "User not found")]
     [SwaggerResponse(400, "An error occurred")]

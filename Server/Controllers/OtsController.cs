@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Amazon.Auth.AccessControlPolicy;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,9 +32,10 @@ public class OtsController : ControllerBase
     #region Create
 
     [HttpPost]
-    // todo auth
-    [SwaggerResponse(200, "Created ots", typeof(Response<Ots>))]
+    [Authorize(Policy = "CanTrainingTickets")]
+    [SwaggerResponse(201, "Created ots", typeof(Response<Ots>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Ots>>> CreateOts([FromBody] Ots ots)
     {
         try
@@ -69,9 +72,10 @@ public class OtsController : ControllerBase
     #region Read
 
     [HttpGet]
-    // todo auth
+    [Authorize(Policy = "CanOts")]
     [SwaggerResponse(200, "Got all ots's", typeof(ResponsePaging<IList<Ots>>))]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<ResponsePaging<IList<Ots>>>> GetOts(int skip = 0, int take = 10, OtsStatus status = OtsStatus.Pending)
     {
         try
@@ -85,15 +89,25 @@ public class OtsController : ControllerBase
     }
 
     [HttpGet("{otsId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanOts")]
     [SwaggerResponse(200, "Got ots", typeof(Response<Ots>))]
     [SwaggerResponse(404, "Ots not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Ots>>> GetOts(int otsId)
     {
         try
         {
             return Ok(await _otsRepository.GetOts(otsId));
+        }
+        catch (OtsNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
         }
         catch (Exception ex)
         {
@@ -106,10 +120,11 @@ public class OtsController : ControllerBase
     #region Update
 
     [HttpPut]
-    // todo auth
+    [Authorize(Policy = "CanOts")]
     [SwaggerResponse(200, "Updated ots", typeof(Response<Ots>))]
     [SwaggerResponse(404, "Ots not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Ots>>> UpdateOts([FromBody] Ots ots)
     {
         try
@@ -126,6 +141,15 @@ public class OtsController : ControllerBase
             }
             return Ok(await _otsRepository.UpdateOts(ots, Request));
         }
+        catch (OtsNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
+        }
         catch (Exception ex)
         {
             return _sentryHub.CaptureException(ex).ReturnActionResult();
@@ -137,15 +161,25 @@ public class OtsController : ControllerBase
     #region Delete
 
     [HttpDelete("{otsId:int}")]
-    // todo auth
+    [Authorize(Policy = "CanOts")]
     [SwaggerResponse(200, "Deleted ots", typeof(Response<Ots>))]
     [SwaggerResponse(404, "Ots not found")]
     [SwaggerResponse(400, "An error occurred")]
+    [SwaggerResponse(401, "Unauthorized")]
     public async Task<ActionResult<Response<Ots>>> DeleteOts(int otsId)
     {
         try
         {
             return Ok(await _otsRepository.DeleteOts(otsId, Request));
+        }
+        catch (OtsNotFoundException ex)
+        {
+            return NotFound(new Response<string>
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = string.Empty
+            });
         }
         catch (Exception ex)
         {
