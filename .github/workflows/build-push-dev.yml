@@ -35,6 +35,7 @@ jobs:
         files: "./Jobs/appsettings.json"
       env:
         ConnectionString: ${{ secrets.CONN_STRING_DEV }}
+        AvwxApiKey: ${{ secrets.AVWX_API_KEY }}
         VatusaApiKey: ${{ secrets.VATUSA_API_KEY }}
         SentryDsn: ${{ secrets.SENTRY_DSN_JOBS }}
     - name: Log into registry

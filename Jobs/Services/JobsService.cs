@@ -9,7 +9,7 @@ public class JobsService : IJobsService
 {
     private readonly IScheduler _scheduler;
 
-    public JobsService(ILogger<JobsService> logger, DatabaseContext context, IVatusaService vatusaService,
+    public JobsService(ILogger<JobsService> logger, DatabaseContext context, IVatusaService vatusaService, IConfiguration configuration,
         IDatafeedService datafeedService, IAvwxService avwxService, ILoggingService loggingService, IEmailService emailService)
     {
         var factory = new StdSchedulerFactory();
@@ -17,6 +17,7 @@ public class JobsService : IJobsService
         _scheduler.Context.Put("Logger", logger);
         _scheduler.Context.Put("DatabaseContext", context);
         _scheduler.Context.Put("VatusaService", vatusaService);
+        _scheduler.Context.Put("Configuration", configuration);
         _scheduler.Context.Put("DatafeedService", datafeedService);
         _scheduler.Context.Put("AvwxService", avwxService);
         _scheduler.Context.Put("LoggingService", loggingService);

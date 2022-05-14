@@ -35,8 +35,10 @@ jobs:
         files: "./Jobs/appsettings.json"
       env:
         ConnectionString: ${{ secrets.CONN_STRING_PROD }}
+        AvwxApiKey: ${{ secrets.AVWX_API_KEY }}
         VatusaApiKey: ${{ secrets.VATUSA_API_KEY }}
         SentryDsn: ${{ secrets.SENTRY_DSN_JOBS }}
+        DiscordWebhook: ${{ secrets.STAFFUP_DISCORD_WEBHOOK }}
     - name: Log into registry
       run: docker login -u ${{ secrets.DO_REGISTRY_TOKEN }} -p ${{ secrets.DO_REGISTRY_TOKEN }} registry.digitalocean.com
     - name: Build server image 

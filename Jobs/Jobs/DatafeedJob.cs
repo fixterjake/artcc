@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CSharpDiscordWebhook.NET.Discord;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Sentry;
+using System.Drawing;
 using ZDC.Jobs.Models;
 using ZDC.Jobs.Services;
 using ZDC.Jobs.Services.Interfaces;
@@ -14,8 +16,8 @@ public class DatafeedJob : IJob
 
     private ILogger<JobsService> _logger;
     private DatabaseContext _context;
-    private ILoggingService _loggingService;
     private IDatafeedService _datafeedService;
+    private DiscordWebhook _webhook;
 
 #nullable restore
 
@@ -24,8 +26,12 @@ public class DatafeedJob : IJob
         var scheduler = context.Scheduler.Context;
         _logger = (ILogger<JobsService>)scheduler.Get("Logger");
         _context = (DatabaseContext)scheduler.Get("DatabaseContext");
-        _loggingService = (ILoggingService)scheduler.Get("LoggingService");
         _datafeedService = (IDatafeedService)scheduler.Get("DatafeedService");
+        var config = (IConfiguration)scheduler.Get("Configuration");
+        _webhook = new DiscordWebhook
+        {
+            Url = config.GetValue<string>("DiscordWebhook")
+        };
 
         _logger.LogInformation("Running datafeed job...");
 
@@ -93,6 +99,8 @@ public class DatafeedJob : IJob
             if (log == null)
             {
                 entry.Duration = entry.End - entry.Start;
+
+                await SendLogoffWebhook(entry);
 
                 var monthHours = await _context.Hours
                     .Where(x => x.UserId == entry.UserId)
@@ -184,6 +192,8 @@ public class DatafeedJob : IJob
                     newLog.Type = ControllerLogType.Center;
 
                 await _context.ControllerLogs.AddAsync(newLog);
+
+                await SendLoginWebhook(newLog);
             }
         }
         await _context.SaveChangesAsync();
@@ -212,5 +222,99 @@ public class DatafeedJob : IJob
             });
         }
         await _context.SaveChangesAsync();
+    }
+
+    public async Task SendLoginWebhook(ControllerLog log)
+    {
+        var user = await _context.Users.FindAsync(log.UserId);
+        if (user != null)
+        {
+            var embed = new DiscordEmbed
+            {
+                Title = $"{log.Callsign.ToUpper()} - Online",
+                Description = $"{log.Callsign.ToUpper()} is now online on the VATSIM network."
+            };
+            embed.Fields.Add(new EmbedField
+            {
+                Name = "Name",
+                Value = user.FullName,
+                InLine = true,
+            });
+            embed.Fields.Add(new EmbedField
+            {
+                Name = "Rating",
+                Value = user.RatingLong,
+                InLine = true,
+            });
+            embed.Fields.Add(new EmbedField
+            {
+                Name = "CID",
+                Value = $"{user.Id}",
+                InLine = true,
+            });
+            embed.Fields.Add(new EmbedField
+            {
+                Name = "Callsign",
+                Value = $"{log.Callsign.ToUpper()}",
+                InLine = true,
+            });
+            embed.Color = Color.Green;
+            embed.Footer = new EmbedFooter
+            {
+                Text = $"vZDC Staffup Bot - {DateTimeOffset.UtcNow:mm/dd/YYYY HH:mm}"
+            };
+            embed.Timestamp = DateTime.UtcNow;
+
+            var message = new DiscordMessage();
+            message.Embeds.Add(embed);
+            _webhook.Send(message);
+        }
+    }
+
+    public async Task SendLogoffWebhook(ControllerLog log)
+    {
+        var user = await _context.Users.FindAsync(log.UserId);
+        if (user != null)
+        {
+            var embed = new DiscordEmbed
+            {
+                Title = $"{log.Callsign.ToUpper()} - Offline",
+                Description = $"{log.Callsign.ToUpper()} is now offline on the VATSIM network."
+            };
+            embed.Fields.Add(new EmbedField
+            {
+                Name = "Name",
+                Value = user.FullName,
+                InLine = true,
+            });
+            embed.Fields.Add(new EmbedField
+            {
+                Name = "Rating",
+                Value = user.RatingLong,
+                InLine = true,
+            });
+            embed.Fields.Add(new EmbedField
+            {
+                Name = "CID",
+                Value = $"{user.Id}",
+                InLine = true,
+            });
+            embed.Fields.Add(new EmbedField
+            {
+                Name = "Callsign",
+                Value = $"{log.Callsign.ToUpper()}",
+                InLine = true,
+            });
+            embed.Color = Color.Red;
+            embed.Footer = new EmbedFooter
+            {
+                Text = $"vZDC Staffup Bot - {DateTimeOffset.UtcNow:mm/dd/YYYY HH:mm}"
+            };
+            embed.Timestamp = DateTime.UtcNow;
+
+            var message = new DiscordMessage();
+            message.Embeds.Add(embed);
+            _webhook.Send(message);
+        }
     }
 }
