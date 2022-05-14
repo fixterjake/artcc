@@ -116,11 +116,18 @@ public class AnnouncementsController : ControllerBase
     #region Update
 
     [HttpPut]
+<<<<<<< HEAD
     [Authorize(Policy = "IsFullStaff")]
     [SwaggerResponse(200, "Updated announcement", typeof(Response<Announcement>))]
     [SwaggerResponse(404, "User or announcement not found")]
     [SwaggerResponse(400, "An error occurred")]
     [SwaggerResponse(401, "Unauthorized")]
+=======
+    // todo auth
+    [SwaggerResponse(200, "Updated announcement", typeof(Response<Announcement>))]
+    [SwaggerResponse(404, "User or announcement not found")]
+    [SwaggerResponse(400, "An error occurred")]
+>>>>>>> b845176c7d200cb135581797a8baa164f68e5371
     public async Task<ActionResult<Response<Announcement>>> UpdateAnnouncement([FromBody] Announcement announcement)
     {
         try
@@ -166,11 +173,18 @@ public class AnnouncementsController : ControllerBase
     #region Delete
 
     [HttpDelete("{AnnouncementId:int}")]
+<<<<<<< HEAD
     [Authorize(Policy = "IsFullStaff")]
     [SwaggerResponse(200, "Deleted announcement", typeof(Response<Announcement>))]
     [SwaggerResponse(404, "News not found")]
     [SwaggerResponse(400, "An error occurred")]
     [SwaggerResponse(401, "Unauthorized")]
+=======
+    // todo auth
+    [SwaggerResponse(200, "Deleted announcement", typeof(Response<Announcement>))]
+    [SwaggerResponse(404, "News not found")]
+    [SwaggerResponse(400, "An error occurred")]
+>>>>>>> b845176c7d200cb135581797a8baa164f68e5371
     public async Task<ActionResult<Response<Announcement>>> DeleteAnnouncement(int announcementId)
     {
         try

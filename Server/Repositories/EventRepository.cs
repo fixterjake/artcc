@@ -167,19 +167,19 @@ public class EventRepository : IEventRepository
     /// <inheritdoc />
     public async Task<Response<Event>> GetEvent(int eventId, HttpRequest request)
     {
-        var @event = await _context.Events
+        var result = await _context.Events
             .Include(x => x.Upload)
             .Include(x => x.Positions)
             .FirstOrDefaultAsync(x => x.Id == eventId) ??
             throw new EventNotFoundException($"Event '{eventId}' not found");
-        if (!await request.HttpContext.IsStaff(_context) && !@event.Open)
+        if (!await request.HttpContext.IsStaff(_context) && !result.Open)
             throw new EventNotFoundException($"Event '{eventId}' not found");
 
         return new Response<Event>
         {
             StatusCode = HttpStatusCode.OK,
             Message = $"Got event '{eventId}'",
-            Data = @event
+            Data = result
         };
     }
 

@@ -161,7 +161,7 @@ public class NotificationRepository : INotificationRepository
         var user = await request.HttpContext.GetUser(_context) ??
             throw new UserNotFoundException("User not found");
 
-        var notifications = await _context.Notifications
+        var result = await _context.Notifications
             .Where(x => !x.Read)
             .Where(x => x.UserId == user.Id)
             .Skip(skip).Take(take)
