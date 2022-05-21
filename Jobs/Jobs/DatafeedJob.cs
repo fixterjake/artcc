@@ -231,42 +231,40 @@ public class DatafeedJob : IJob
         {
             var embed = new DiscordEmbed
             {
-                Title = $"{log.Callsign.ToUpper()} - Online",
-                Description = $"{log.Callsign.ToUpper()} is now online on the VATSIM network."
+                Title = $"{log.Callsign.ToUpper()} - Online"
             };
-            embed.Fields.Add(new EmbedField
+            embed.Fields = new List<EmbedField>
             {
-                Name = "Name",
-                Value = user.FullName,
-                InLine = true,
-            });
-            embed.Fields.Add(new EmbedField
-            {
-                Name = "Rating",
-                Value = user.RatingLong,
-                InLine = true,
-            });
-            embed.Fields.Add(new EmbedField
-            {
-                Name = "CID",
-                Value = $"{user.Id}",
-                InLine = true,
-            });
-            embed.Fields.Add(new EmbedField
-            {
-                Name = "Callsign",
-                Value = $"{log.Callsign.ToUpper()}",
-                InLine = true,
-            });
+                new EmbedField
+                {
+                    Name = "Name",
+                    Value = user.FullName,
+                    InLine = true,
+                },
+                new EmbedField
+                {
+                    Name = "Rating",
+                    Value = user.RatingLong,
+                    InLine = true,
+                },
+                new EmbedField
+                {
+                    Name = "CID",
+                    Value = $"{user.Id}",
+                    InLine = true,
+                }
+            };
             embed.Color = Color.Green;
             embed.Footer = new EmbedFooter
             {
-                Text = $"vZDC Staffup Bot - {DateTimeOffset.UtcNow:mm/dd/YYYY HH:mm}"
+                Text = $"vZDC Staffup Bot - {DateTimeOffset.UtcNow:MM/dd/yyyy HH:mm}"
             };
-            embed.Timestamp = DateTime.UtcNow;
 
             var message = new DiscordMessage();
-            message.Embeds.Add(embed);
+            message.Embeds = new List<DiscordEmbed>
+            {
+                embed
+            };
             _webhook.Send(message);
         }
     }
@@ -278,42 +276,40 @@ public class DatafeedJob : IJob
         {
             var embed = new DiscordEmbed
             {
-                Title = $"{log.Callsign.ToUpper()} - Offline",
-                Description = $"{log.Callsign.ToUpper()} is now offline on the VATSIM network."
+                Title = $"{log.Callsign.ToUpper()} - Offline"
             };
-            embed.Fields.Add(new EmbedField
+            embed.Fields = new List<EmbedField>
             {
-                Name = "Name",
-                Value = user.FullName,
-                InLine = true,
-            });
-            embed.Fields.Add(new EmbedField
-            {
-                Name = "Rating",
-                Value = user.RatingLong,
-                InLine = true,
-            });
-            embed.Fields.Add(new EmbedField
-            {
-                Name = "CID",
-                Value = $"{user.Id}",
-                InLine = true,
-            });
-            embed.Fields.Add(new EmbedField
-            {
-                Name = "Callsign",
-                Value = $"{log.Callsign.ToUpper()}",
-                InLine = true,
-            });
+                new EmbedField
+                {
+                    Name = "Name",
+                    Value = user.FullName,
+                    InLine = true,
+                },
+                new EmbedField
+                {
+                    Name = "Rating",
+                    Value = user.RatingLong,
+                    InLine = true,
+                },
+                new EmbedField
+                {
+                    Name = "CID",
+                    Value = $"{user.Id}",
+                    InLine = true,
+                }
+            };
             embed.Color = Color.Red;
             embed.Footer = new EmbedFooter
             {
-                Text = $"vZDC Staffup Bot - {DateTimeOffset.UtcNow:mm/dd/YYYY HH:mm}"
+                Text = $"vZDC Staffup Bot - {DateTimeOffset.UtcNow:MM/dd/yyyy HH:mm}"
             };
-            embed.Timestamp = DateTime.UtcNow;
 
             var message = new DiscordMessage();
-            message.Embeds.Add(embed);
+            message.Embeds = new List<DiscordEmbed>
+            {
+                embed
+            };
             _webhook.Send(message);
         }
     }
