@@ -30,7 +30,7 @@ var host = Host.CreateDefaultBuilder(args)
 var scope = host.Services.CreateScope();
 var services = scope.ServiceProvider;
 var jobs = services.GetRequiredService<IJobsService>();
-jobs.AddDatafeedJob(TimeSpan.Zero, 15);
+jobs.AddDatafeedJob(TimeSpan.Zero, 20);
 jobs.AddRosterJob(TimeSpan.FromSeconds(10), 15);
 jobs.AddAirportsJob(TimeSpan.FromSeconds(20), 5);
 jobs.AddEventEmailsJob(TimeSpan.FromSeconds(30), 30);

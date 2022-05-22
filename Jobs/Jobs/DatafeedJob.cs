@@ -55,7 +55,10 @@ public class DatafeedJob : IJob
         {
             var datafeed = await _datafeedService.GetDatafeed();
             if (datafeed == null || datafeed.Controllers == null || datafeed.Pilots == null)
+            {
+                await UpdateTimes();
                 return;
+            }
 
             if (datafeed.Controllers.Count == 0)
             {
@@ -88,9 +91,6 @@ public class DatafeedJob : IJob
     {
         foreach (var entry in _context.ControllerLogs.Where(x => x.Duration == TimeSpan.Zero).ToList())
         {
-            var oneMinuteAgo = DateTimeOffset.UtcNow.AddMinutes(-1);
-            if (entry.End > oneMinuteAgo)
-                continue;
             var log = controllers
                 .Where(x => x.Cid == entry.UserId)
                 .Where(x => x.Login == entry.Start)
