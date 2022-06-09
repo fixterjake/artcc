@@ -2,7 +2,6 @@
 using System.Net.Http.Json;
 using ZDC.Jobs.Models;
 using ZDC.Jobs.Services.Interfaces;
-using ZDC.Shared.Models;
 
 namespace ZDC.Jobs.Services;
 

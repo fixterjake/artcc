@@ -1,0 +1,15 @@
+﻿@page "/auth/callback"
+@layout EmptyLayout
+@using Microsoft.AspNetCore.WebUtilities
+@using VATSIM.Connect.AspNetCore.Blazor.Client.Services
+@using ZDC.Client.Shared.Components
+@using ZDC.Web.Client.Services
+@inject NavigationManager Navigation
+@inject IVatsimAuthService AuthService
+@inject SpinnerService SpinnerService
+
+<ZdcContainer PageMargins="false">
+    <p class="text-center text-white">
+        Please wait while your session is authenticated
+    </p>
+</ZdcContainer>

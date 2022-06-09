@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<a class="dropdown-item" href="tickets/manage">Training Tickets</a>
+<AuthorizeView Policy="CanOts">
+    <Authorized>
+        <a class="dropdown-item" href="ots/manage">OTS Center</a>
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Policy="CanFeedback">
+    <Authorized>
+        <a class="dropdown-item" href="feedback/manage">Feedback</a>
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Policy="IsSeniorStaff">
+    <Authorized>
+        <a class="dropdown-item" href="training/manage">Training Staff Management</a>
+    </Authorized>
+</AuthorizeView>

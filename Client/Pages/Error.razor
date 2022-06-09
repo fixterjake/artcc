@@ -1,0 +1,31 @@
+﻿@page "/error/{Code}"
+@using Blazorise
+@using ZDC.Client.Shared.Components
+
+<PageTitle>Washington ARTCC - Error</PageTitle>
+
+<ZdcContainer PageMargins="true">
+    <Row Class="justify-content-center">
+        <Column ColumnSize="ColumnSize.Is6">
+            <ZdcCard Title="An Error Has Occurred" Icon="fa-exclamation-circle">
+                <Heading Size="HeadingSize.Is4" Class="text-center">An Error Has Ocurred</Heading>
+                <Heading Size="HeadingSize.Is5" Class="text-center">@Code</Heading>
+                <Heading Size="HeadingSize.Is6" Class="text-center">
+                    Please submit a bug report with this error code.
+                </Heading>
+                <hr />
+                <Container Class="text-center">
+                    <a href="https://github.com/vzdc/ZDC.Web/issues/new?assignees=fixterjake&labels=needs+triage&template=bug_report.md&title=%5BBug+Report%5D+-+"
+                       target="_blank" class="btn bg-primary text-light">
+                        Bug Report
+                    </a>
+                </Container>
+            </ZdcCard>
+        </Column>
+    </Row>
+</ZdcContainer>
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+}

@@ -1,0 +1,23 @@
+﻿@if (PageMargins)
+{
+    <div class="container-zdc page-margins">
+        @ChildContent
+    </div>
+
+}
+else
+{
+    <div class="container-zdc">
+        @ChildContent
+    </div>
+
+}
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public bool PageMargins { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

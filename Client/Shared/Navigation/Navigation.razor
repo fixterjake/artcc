@@ -1,0 +1,99 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using VATSIM.Connect.AspNetCore.Blazor.Client.Services
+@using ZDC.Client.Shared.Components
+@inject NavigationManager Nav
+@inject IVatsimAuthService AuthService
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-gray-800 fixed-top text-lg">
+    <ZdcContainer PageMargins="false">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+        <div class="collapse navbar-collapse" id="navbar">
+            <a class="navbar-brand" href="">
+                <img class="img-fluid" src="https://vzdc.nyc3.digitaloceanspaces.com/Images/logo.png" alt="Washington ARTCC" />
+            </a>
+            <div class="navbar-nav">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="controller" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Controller Resources
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="controller">
+                        <Controllers />
+                    </div>
+                </div>
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="pilot" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Pilot Resources
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="pilot">
+                        <a class="dropdown-item" href="charts">Charts</a>
+                        <a class="dropdown-item" href="staffing">Request Staffing</a>
+                        <a class="dropdown-item" href="feedback">Feedback</a>
+                    </div>
+                </div>
+                <AuthorizeView Policy="IsTrainingStaff">
+                    <Authorized>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="training-management" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                Training Management
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="training-management">
+                                <TrainingStaff />
+                            </div>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Policy="IsStaff">
+                    <Authorized>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="artcc-management" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                ARTCC Management
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="artcc-management">
+                                <Management />
+                            </div>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="profile" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                @context?.User?.Identity?.Name
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="profile">
+                                <a class="dropdown-item" href="profile">Profile</a>
+                                <a class="dropdown-item" href="" @onclick="OnLogoutClicked">Logout</a>
+                            </div>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <div class="nav-item">
+                            <a class="nav-link" href="" @onclick="OnLoginClicked">Login</a>
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </ZdcContainer>
+</nav>
+@code
+{
+    private async Task OnLoginClicked()
+    {
+        await Task.CompletedTask;
+        Nav.NavigateTo("/auth/login");
+    }
+
+    private async Task OnLogoutClicked()
+    {
+        await AuthService.Logout();
+        Nav.NavigateTo("/", true);
+    }
+}

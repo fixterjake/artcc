@@ -1,0 +1,587 @@
+@import "variables.scss";
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
+
+.bg-primary {
+    background-color: $primary !important
+}
+
+.bg-secondary {
+    background-color: $secondary !important
+}
+
+.bg-primary-desat {
+    background-color: $primary-desat !important
+}
+
+.bg-success {
+    background-color: $success !important
+}
+
+.bg-info {
+    background-color: $info !important
+}
+
+.bg-warning {
+    background-color: $warning !important
+}
+
+.bg-danger {
+    background-color: $danger !important
+}
+
+.bg-white {
+    background-color: $white !important
+}
+
+.bg-black {
+    background-color: $black !important
+}
+
+.bg-light {
+    background-color: $light !important
+}
+
+.bg-light-gray {
+    background-color: $light-gray !important
+}
+
+.bg-gray {
+    background-color: $gray !important
+}
+
+.bg-gray-muted {
+    background-color: $gray-muted !important
+}
+
+.bg-gray-100 {
+    background-color: $gray-100 !important
+}
+
+.bg-gray-200 {
+    background-color: $gray-200 !important
+}
+
+.bg-gray-300 {
+    background-color: $gray-300 !important
+}
+
+.bg-gray-400 {
+    background-color: $gray-400 !important
+}
+
+.bg-gray-500 {
+    background-color: $gray-500 !important
+}
+
+.bg-gray-600 {
+    background-color: $gray-600 !important
+}
+
+.bg-gray-700 {
+    background-color: $gray-700 !important
+}
+
+.bg-gray-800 {
+    background-color: $gray-800 !important
+}
+
+.bg-gray-900 {
+    background-color: $gray-900 !important
+}
+
+.bg-blue {
+    background-color: $blue !important
+}
+
+.bg-red {
+    background-color: $red !important
+}
+
+.text-primary {
+    color: $primary !important
+}
+
+.text-secondary {
+    color: $secondary !important
+}
+
+.text-primary-desat {
+    color: $primary-desat !important
+}
+
+.text-success {
+    color: $success !important
+}
+
+.text-info {
+    color: $info !important
+}
+
+.text-warning {
+    color: $warning !important
+}
+
+.text-danger {
+    color: $danger !important
+}
+
+.text-light {
+    color: $light !important
+}
+
+.text-white {
+    color: $white !important
+}
+
+.text-black {
+    color: $black !important
+}
+
+.text-gray-100 {
+    color: $gray-100 !important
+}
+
+.text-gray-200 {
+    color: $gray-200 !important
+}
+
+.text-gray-300 {
+    color: $gray-300 !important
+}
+
+.text-gray-400 {
+    color: $gray-400 !important
+}
+
+.text-gray-500 {
+    color: $gray-500 !important
+}
+
+.text-gray-600 {
+    color: $gray-600 !important
+}
+
+.text-gray-700 {
+    color: $gray-700 !important
+}
+
+.text-gray-800 {
+    color: $gray-800 !important
+}
+
+.text-gray-900 {
+    color: $gray-900 !important
+}
+
+.font-w300 {
+    font-weight: 300 !important;
+}
+
+.font-w400 {
+    font-weight: 400 !important;
+}
+
+.font-w500 {
+    font-weight: 500 !important;
+}
+
+.font-w700 {
+    font-weight: 700 !important;
+}
+
+.font-w900 {
+    font-weight: 900 !important;
+}
+
+.font-sm {
+    font-size: 14px !important;
+}
+
+.font-md {
+    font-size: 16px !important;
+}
+
+.font-ml {
+    font-size: 18px !important;
+}
+
+.font-lg {
+    font-size: 19px !important;
+}
+
+.font-xl {
+    font-size: 25px !important;
+}
+
+.fill-transparent {
+    fill: transparent !important;
+}
+
+.fill-primary {
+    fill: $primary !important;
+}
+
+.fill-secondary {
+    fill: $secondary !important;
+}
+
+.fill-primary-desat {
+    fill: $primary-desat !important;
+}
+
+.fill-success {
+    fill: $success !important;
+}
+
+.fill-info {
+    fill: $info !important;
+}
+
+.fill-warning {
+    fill: $warning !important;
+}
+
+.fill-danger {
+    fill: $danger !important;
+}
+
+.fill-light {
+    fill: $light !important;
+}
+
+.fill-dark {
+    fill: $dark !important;
+}
+
+.border-light {
+    border-color: $light !important
+}
+
+// Scroll
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+// Global
+
+* {
+    font-family: "Ubuntu", sans-serif;
+}
+
+body {
+    background-color: $gray !important;
+}
+
+a {
+    text-decoration: none !important;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content {
+    flex: 1 0 auto;
+}
+
+.loader {
+    font-size: 10px;
+    margin: 50px auto;
+    text-indent: -9999em;
+    width: 11em;
+    height: 11em;
+    border-radius: 50%;
+    background: $white;
+    background: -moz-linear-gradient(left, $white 10%, rgba(255, 255, 255, 0) 42%);
+    background: -webkit-linear-gradient(left, $white 10%, rgba(255, 255, 255, 0) 42%);
+    background: -o-linear-gradient(left, $white 10%, rgba(255, 255, 255, 0) 42%);
+    background: -ms-linear-gradient(left, $white 10%, rgba(255, 255, 255, 0) 42%);
+    background: linear-gradient(to right, $white 10%, rgba(255, 255, 255, 0) 42%);
+    position: relative;
+    -webkit-animation: load3 1.4s infinite linear;
+    animation: load3 1.4s infinite linear;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+}
+
+.loader:before {
+    width: 50%;
+    height: 50%;
+    background: $white;
+    border-radius: 100% 0 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+}
+
+.loader:after {
+    background: $gray;
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    content: "";
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+@-webkit-keyframes load3 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes load3 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+
+// nav tabs
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link {
+    border-radius: 5px !important;
+    transition: background-color linear 0.2s !important;
+    margin-bottom: 1rem !important;
+    border: none;
+
+    &.active {
+        border-bottom: 4px solid $primary-desat !important;
+        background-color: $light-gray !important;
+    }
+
+    &:hover {
+        background-color: $light-gray-hover !important;
+    }
+}
+
+// tooltips
+
+a .b-tooltip {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 1rem !important;
+}
+
+
+// Blazor error message
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+// Forms
+.form-control, .form-control:focus, .form-select, .form-select:focus {
+    background-color: $gray;
+    color: $white !important;
+    border-color: #212529;
+}
+
+.form-control[disabled] {
+    background-color: $gray-muted;
+    color: $white !important;
+    border-color: #212529;
+}
+
+// home image
+.home-image {
+    height: auto;
+    width: 100%;
+}
+
+// margins
+.container-zdc {
+    margin-left: 10% !important;
+    margin-right: 10% !important;
+}
+
+.page-margins {
+    margin-top: 5%;
+}
+
+.home-margin {
+    margin-top: 6.8vh;
+}
+
+// Nav
+#navbar, #navbar-home {
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+}
+
+.navbar-nav {
+    margin-left: auto;
+}
+
+.nav-link {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    color: $white !important;
+}
+
+.navbar-dark .navbar-brand img {
+    filter: brightness(0) invert(1);
+}
+
+.navbar .dropdown-menu .dropdown-item {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    color: $white !important;
+}
+
+.navbar .dropdown-menu {
+    transition: 0.3s;
+    min-width: 10rem;
+    background-color: $gray;
+}
+
+.dropdown-menu > a:hover, .dropdown-menu > a:focus {
+    transition: 0.3s;
+    background-color: $light-gray-hover;
+}
+
+// Home
+.announcement {
+    display: flex;
+    justify-content: space-between;
+
+    .announcement-badge {
+        margin-left: 0.2rem;
+        padding: 0.25rem;
+        font-size: 0.8rem;
+        display: flex;
+        justify-content: right;
+    }
+}
+
+.center-home {
+    margin: auto;
+    width: 6%;
+}
+
+// Footer
+.footer-link {
+    color: $white !important;
+
+    :hover {
+        color: $white !important;
+        text-decoration: underline !important;
+        text-decoration-color: $white !important;
+    }
+}
+
+.footer {
+    position: relative;
+    margin-top: -150px;
+    clear: both;
+}
+
+// Cards
+.card {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    .card-header {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: $gray-400;
+        background-color: $light;
+    }
+}
+
+// Staff
+.top {
+    min-height: 40px;
+}
+
+.training-staff-height {
+    min-height: 20rem !important;
+}
+
+// Roster
+.roster-user {
+    margin: 0.2rem;
+    padding: 0.6rem;
+    font-size: 0.85rem;
+}
+
+.roster-name {
+    width: 20%;
+}
+
+.roster-roles {
+    width: 80%;
+}
+
+td > a {
+    color: $black;
+
+    :hover {
+        color: $black;
+        text-decoration: underline;
+        text-decoration-color: $black;
+    }
+}
+
+.roster-edit-cursor {
+    cursor: pointer;
+}
+
+// Statistics
+.center {
+    margin: auto;
+    width: 5%;
+}
+
+// Events
+
+.closed {
+    filter: grayscale(1) !important;
+}

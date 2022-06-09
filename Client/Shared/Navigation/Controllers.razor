@@ -1,0 +1,14 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient Http
+
+<a class="dropdown-item" href="staff">Staff</a>
+<a class="dropdown-item" href="roster">Roster</a>
+<a class="dropdown-item" href="statistics">Statistics</a>
+<a class="dropdown-item" href="files">Files</a>
+<a class="dropdown-item" href="events">Events</a>
+<AuthorizeView Policy="CanSignupTraining">
+    <Authorized>
+        <a class="dropdown-item" target="_blank"
+           href="https://my.setmore.com/bookingpage/acfb9e67-05a7-4f0e-aaee-feb54a13a41e">Schedule Training</a>
+    </Authorized>
+</AuthorizeView>

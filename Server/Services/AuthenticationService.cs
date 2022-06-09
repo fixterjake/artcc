@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using VATSIM.Connect.AspNetCore.Server.Services;
 using VATSIM.Connect.AspNetCore.Shared.DTO;
@@ -24,7 +22,6 @@ public class AuthenticationService : IVatsimAuthenticationService
         var claims = new List<Claim>();
         var u = await _context.Users
             .Include(x => x.Roles)
-            .Include(x => x.Status)
             .FirstOrDefaultAsync(x => x.Id == user.Cid);
         if (u == null || u.Status == UserStatus.Removed)
         {

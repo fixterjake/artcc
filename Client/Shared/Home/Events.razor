@@ -1,0 +1,33 @@
+﻿@using Blazorise
+@using ZDC.Shared.Models
+<Table Responsive="true" Borderless="true">
+    @if (Event != null && Event.Any())
+    {
+        foreach (var entry in Event)
+        {
+            <TableRow>
+                <TableRowCell Class="text-center">
+                    <a href="event/@entry.Id">
+                        <img class="img-fluid rounded" src="@entry?.Upload?.Url" alt="@entry?.Name"
+                    style="width: 90%; height: auto" />
+                    </a>
+                </TableRowCell>
+            </TableRow>
+            <br /> 
+        }
+    }
+    else
+    {
+        <TableRow Class="bg-light-gray text-light font-ml text-center">
+            <TableRowCell>
+                No events found
+            </TableRowCell>
+        </TableRow>
+    }
+</Table>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public IList<Event>? Event { get; set; }
+}

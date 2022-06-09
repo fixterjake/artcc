@@ -1,0 +1,29 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<AuthorizeView Policy="IsFullStaff">
+    <Authorized>
+        <a class="dropdown-item" href="announcements/manage">Announcements</a>
+        <a class="dropdown-item" href="email/manage">Emailing</a>
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Policy="CanAirports">
+    <Authorized>
+        <a class="dropdown-item" href="airports/manage">Airports</a>
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Policy="CanFeedback">
+    <Authorized>
+        <a class="dropdown-item" href="events/manage">Feedback</a>
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Policy="IsSeniorStaff">
+    <Authorized>
+        <a class="dropdown-item" href="loas/manage">LOA Center</a>
+        <a class="dropdown-item" href="visit/manage">Visit Requests</a>
+        <a class="dropdown-item" href="roster/manage">Roster Management</a>
+        <a class="dropdown-item" href="incidentreports/manage">Incident Reports</a>
+        <a class="dropdown-item" href="dossier/manage">Dossier Entries</a>
+        <a class="dropdown-item" href="settings/manage">Settings</a>
+        <a class="dropdown-item" href="logs/manage">Website Logs</a>
+    </Authorized>
+</AuthorizeView>

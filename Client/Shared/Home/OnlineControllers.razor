@@ -1,0 +1,39 @@
+﻿@using Blazorise
+@using ZDC.Shared.Models
+
+<Table Responsive="true" Borderless="true" Class="bg-light-gray text-light font-ml">
+    <TableHeader>
+        <TableRow Class="border-bottom border-light text-center">
+            <TableRowHeader>Position</TableRowHeader>
+            <TableRowHeader>Frequency</TableRowHeader>
+            <TableRowHeader>Name</TableRowHeader>
+            <TableRowHeader>Time Online</TableRowHeader>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @if (Controllers != null && Controllers.Any())
+        {
+            foreach (var entry in Controllers)
+            {
+                <TableRow Class="text-center">
+                    <TableRowCell>@entry.Callsign</TableRowCell>
+                    <TableRowCell>@entry.Frequency</TableRowCell>
+                    <TableRowCell>@entry.User</TableRowCell>
+                    <TableRowCell>@entry.Duration</TableRowCell>
+                </TableRow>
+            }
+        }
+        else
+        {
+            <TableRow Class="text-center">
+                <TableRowCell ColumnSpan="4">No online controllers found</TableRowCell>
+            </TableRow>
+        }
+    </TableBody>
+</Table>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public IList<OnlineController>? Controllers { get; set; }
+}

@@ -1,10 +1,8 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
-using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using ZDC.Server.Extensions;
 using ZDC.Server.Repositories.Interfaces;
@@ -33,24 +31,26 @@ public class AirportsController : ControllerBase
 
     [HttpPost]
     [Authorize(Policy = "CanAirports")]
-    [SwaggerResponse(201, "Created airport", typeof(Response<Airport>))]
-    [SwaggerResponse(400, "An error occurred")]
-    [SwaggerResponse(401, "Unauthorized")]
+    [ProducesResponseType(typeof(Response<Airport>), 201)]
+    [ProducesResponseType(typeof(Response<string>), 401)]
+    [ProducesResponseType(typeof(Response<string>), 400)]
+    [ProducesResponseType(typeof(Response<string>), 500)]
     public async Task<ActionResult<Response<Airport>>> CreateAirport([FromBody] Airport airport)
     {
         try
         {
-            var result = await _validator.ValidateAsync(airport);
-            if (!result.IsValid)
+            var valid = await _validator.ValidateAsync(airport);
+            if (!valid.IsValid)
             {
                 return BadRequest(new Response<IList<ValidationFailure>>
                 {
                     StatusCode = HttpStatusCode.BadRequest,
                     Message = "Validation error",
-                    Data = result.Errors
+                    Data = valid.Errors
                 });
             }
-            return Ok(await _airportRepository.CreateAirport(airport, Request));
+            var result = await _airportRepository.CreateAirport(airport, Request);
+            return CreatedAtAction(nameof(GetAirport), new { airportId = result?.Data?.Id }, result);
         }
         catch (Exception ex)
         {
@@ -63,8 +63,8 @@ public class AirportsController : ControllerBase
     #region Read
 
     [HttpGet]
-    [SwaggerResponse(200, "Got all airports", typeof(Response<IList<Airport>>))]
-    [SwaggerResponse(400, "An error occurred")]
+    [ProducesResponseType(typeof(Response<IList<Airport>>), 200)]
+    [ProducesResponseType(typeof(Response<string>), 500)]
     public async Task<ActionResult<Response<IList<Airport>>>> GetAirports()
     {
         try
@@ -78,9 +78,9 @@ public class AirportsController : ControllerBase
     }
 
     [HttpGet("{airportId:int}")]
-    [SwaggerResponse(200, "Got airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
-    [SwaggerResponse(400, "An error occurred")]
+    [ProducesResponseType(typeof(Response<IList<Airport>>), 200)]
+    [ProducesResponseType(typeof(Response<string>), 404)]
+    [ProducesResponseType(typeof(Response<string>), 500)]
     public async Task<ActionResult<Response<Airport>>> GetAirport(int airportId)
     {
         try
@@ -108,10 +108,10 @@ public class AirportsController : ControllerBase
 
     [HttpPut]
     [Authorize(Policy = "CanAirports")]
-    [SwaggerResponse(200, "Updated airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
-    [SwaggerResponse(400, "An error occurred")]
-    [SwaggerResponse(401, "Unauthorized")]
+    [ProducesResponseType(typeof(Response<Airport>), 200)]
+    [ProducesResponseType(typeof(Response<string>), 401)]
+    [ProducesResponseType(typeof(Response<string>), 400)]
+    [ProducesResponseType(typeof(Response<string>), 500)]
     public async Task<ActionResult<Response<Airport>>> UpdateAirport([FromBody] Airport airport)
     {
         try
@@ -149,10 +149,10 @@ public class AirportsController : ControllerBase
 
     [HttpDelete("{airportId:int}")]
     [Authorize(Policy = "CanAirports")]
-    [SwaggerResponse(200, "Deleted airport", typeof(Response<Airport>))]
-    [SwaggerResponse(404, "Airport not found")]
-    [SwaggerResponse(400, "An error occurred")]
-    [SwaggerResponse(401, "Unauthorized")]
+    [ProducesResponseType(typeof(Response<Airport>), 200)]
+    [ProducesResponseType(typeof(Response<string>), 401)]
+    [ProducesResponseType(typeof(Response<string>), 400)]
+    [ProducesResponseType(typeof(Response<string>), 500)]
     public async Task<ActionResult<Response<Airport>>> DeleteAirport(int airportId)
     {
         try

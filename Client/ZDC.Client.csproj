@@ -7,13 +7,27 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Blazorise.Bootstrap" Version="1.0.5" />
+		<PackageReference Include="Blazorise.Bootstrap5" Version="1.0.5" />
+		<PackageReference Include="Blazorise.Charts" Version="1.0.5" />
+		<PackageReference Include="Blazorise.Charts.Trendline" Version="1.0.5" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.5" />
+		<PackageReference Include="Blazorise.RichTextEdit" Version="1.0.5" />
+		<PackageReference Include="Faso.Blazor.SpinKit" Version="1.0.1" />
+		<PackageReference Include="LibSassBuilder" Version="2.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
 		<PackageReference Include="VATSIM.Connect.AspNetCore.Blazor.Client" Version="1.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Shared\ZDC.Shared.csproj" />
+		<ProjectReference Include="..\Shared\ZDC.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\css\" />
 	</ItemGroup>
 
 </Project>

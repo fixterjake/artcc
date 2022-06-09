@@ -1,0 +1,57 @@
+﻿@using Blazorise;
+@using Microsoft.AspNetCore.Components.Authorization
+
+<Blazorise.Bootstrap5.Card Class="shadow-lg bg-light-gray text-light">
+    <CardHeader Class="bg-light-gray">
+        @if (AddLink)
+        {
+            <Heading Size="HeadingSize.Is4" Class="text-center font-w500">
+                <Icon Name="@(Icon)" /> @Title
+            </Heading>
+            <AuthorizeView Policy="@AddLinkPolicy">
+                <Authorized>
+                    <a href="@AddLinkRoute" class="text-center justify-content-center">
+                        <Tooltip Text="@AddLinkTooltip" Placement="TooltipPlacement.Top">
+                            <Icon Name="IconName.PlusCircle" Class="text-light"/>
+                        </Tooltip>
+                    </a>
+                </Authorized>
+            </AuthorizeView>
+        }
+        else
+        {
+            <Heading Size="HeadingSize.Is4" Class="text-center font-w500">
+                <Icon Name="@(Icon)" /> @Title
+            </Heading>
+        }
+    </CardHeader>
+    <CardBody>
+        @ChildContent
+    </CardBody>
+</Blazorise.Bootstrap5.Card>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    [EditorRequired]
+    public string Icon { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool AddLink { get; set; }
+
+    [Parameter]
+    public string AddLinkPolicy { get; set; } = string.Empty;
+
+    [Parameter]
+    public string AddLinkRoute { get; set; } = string.Empty;
+
+    [Parameter]
+    public string AddLinkTooltip { get; set; } = string.Empty;
+
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+}

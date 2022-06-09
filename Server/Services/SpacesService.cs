@@ -29,6 +29,6 @@ public class SpacesService : ISpacesService
             CannedACL = S3CannedACL.PublicRead
         };
         await _client.PutObjectAsync(request);
-        return $"https://vzdc-k8s.nyc3.digitaloceanspaces.com/{type}/{fileName}";
+        return $"https://vzdc.nyc3.digitaloceanspaces.com/{type}/{fileName}";
     }
 }

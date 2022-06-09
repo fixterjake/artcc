@@ -1,7 +1,4 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using FluentValidation;
-using FluentValidation.Results;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using Swashbuckle.AspNetCore.Annotations;
